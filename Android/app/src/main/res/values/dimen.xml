@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- TODO(mjmaurer): tinker with this -->
+    <dimen name="drawer_width">56dp</dimen>
+    <dimen name="action_bar_width">0dp</dimen>
+</resources>
