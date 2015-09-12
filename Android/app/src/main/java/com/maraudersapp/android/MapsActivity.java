@@ -1,6 +1,7 @@
 package com.maraudersapp.android;
 
 import android.content.res.Configuration;
+import android.content.Intent;
 import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
 import android.support.v4.widget.DrawerLayout;
@@ -8,6 +9,8 @@ import android.support.v7.app.ActionBarActivity;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.view.LayoutInflater;
+import android.view.View;
 import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -40,7 +43,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_maps);
 
-        initView();
+        initDrawerView();
         if (mToolbar != null) {
             mToolbar.setTitle("Navigation Drawer");
             setSupportActionBar(mToolbar);
@@ -58,16 +61,14 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         mDrawerLayout.setDrawerListener(mDrawerToggle);
     }
 
-    private void initView() {
+    private void initDrawerView() {
         mToolbar = (Toolbar) findViewById(R.id.toolbar);
-
         mDrawer = (ListView) findViewById(R.id.left_drawer);
         mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
         // TODO not sure what the deal with this simple list item is
         mDrawerAdapter=new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, leftSliderData);
         mDrawer.setAdapter(mDrawerAdapter);
     }
-
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -81,7 +82,14 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         if (mDrawerToggle.onOptionsItemSelected(item)) {
             return true;
         }
-        return super.onOptionsItemSelected(item);
+        switch (item.getItemId()) {
+            case R.id.plus_button:
+                startActivity(new Intent(MapsActivity.this, BottomMenuActivity.class));
+                return true;
+
+            default:
+                return super.onOptionsItemSelected(item);
+        }
     }
 
     @Override
