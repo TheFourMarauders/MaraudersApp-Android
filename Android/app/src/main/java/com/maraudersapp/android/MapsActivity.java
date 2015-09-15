@@ -12,8 +12,10 @@ import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
+import android.widget.RelativeLayout;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -56,6 +58,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     private void initDrawer() {
         mDrawerToggle= new ActionBarDrawerToggle(this, mDrawerLayout,mToolbar, R.string.app_name, R.string.app_name);
         mDrawerLayout.setDrawerListener(mDrawerToggle);
+        mDrawerLayout.setStatusBarBackgroundColor(R.color.colorPrimary);
     }
 
     private void initView() {
@@ -66,6 +69,10 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         // TODO not sure what the deal with this simple list item is
         mDrawerAdapter=new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, leftSliderData);
         mDrawer.setAdapter(mDrawerAdapter);
+
+        // TODO dynamic images. See http://velmuruganandroidcoding.blogspot.com/2014/09/navigation-drawer-with-header-in-android.html
+        View header=getLayoutInflater().inflate(R.layout.navigation_drawer_header, null);
+        mDrawer.addHeaderView(header);
     }
 
 
