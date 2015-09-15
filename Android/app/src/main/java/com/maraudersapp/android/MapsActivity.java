@@ -61,7 +61,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     private void initDrawer() {
         mDrawerToggle= new ActionBarDrawerToggle(this, mDrawerLayout,mToolbar, R.string.app_name, R.string.app_name);
         mDrawerLayout.setDrawerListener(mDrawerToggle);
-        mDrawerLayout.setStatusBarBackgroundColor(R.color.colorPrimary);
+        mDrawerLayout.setStatusBarBackgroundColor(getResources().getColor(R.color.colorPrimary));
     }
 
     private void initDrawerView() {
@@ -90,10 +90,6 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
             return true;
         }
         switch (item.getItemId()) {
-            case R.id.plus_button:
-                startActivity(new Intent(MapsActivity.this, BottomMenuActivity.class));
-                return true;
-
             default:
                 return super.onOptionsItemSelected(item);
         }
