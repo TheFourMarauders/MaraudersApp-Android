@@ -9,12 +9,6 @@
 
     <include layout="@layout/toolbar"/>
 
-    <com.flipboard.bottomsheet.BottomSheetLayout
-        android:id="@+id/bottomsheet"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:fitsSystemWindows="true">
-
         <android.support.v4.widget.DrawerLayout
             android:id="@+id/drawer_layout"
             android:layout_width="match_parent"
@@ -46,5 +40,4 @@
                     android:dividerHeight="1dp" />
             </RelativeLayout>
         </android.support.v4.widget.DrawerLayout>
-    </com.flipboard.bottomsheet.BottomSheetLayout>
 </LinearLayout>

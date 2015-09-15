@@ -1,5 +1,6 @@
 package com.maraudersapp.android;
 
+import android.content.DialogInterface;
 import android.content.res.Configuration;
 import android.content.Intent;
 import android.support.v4.app.FragmentActivity;
@@ -20,6 +21,7 @@ import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.RelativeLayout;
 
+import com.cocosw.bottomsheet.BottomSheet;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
@@ -91,8 +93,14 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         }
         switch (item.getItemId()) {
             case R.id.plus_button:
-                startActivity(new Intent(MapsActivity.this, BottomMenuActivity.class));
-                return true;
+                new BottomSheet.Builder(this).title("Create new...").sheet(R.menu.create).listener(new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        switch (which) {
+
+                        }
+                    }
+                }).show();
 
             default:
                 return super.onOptionsItemSelected(item);
