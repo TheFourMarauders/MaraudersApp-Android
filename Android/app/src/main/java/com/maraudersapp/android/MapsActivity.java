@@ -38,7 +38,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     private ActionBarDrawerToggle mDrawerToggle;
 
     // TODO change this to some data structure
-    private String[] leftSliderData = {"Home", "Android", "Sitemap", "About", "Contact Me"};
+    private String[] leftSliderData = {"Yourself", "Friends", "Groups", "Incognito", "Settings", "Log Out"};
     private ArrayAdapter<String> mDrawerAdapter;
 
 

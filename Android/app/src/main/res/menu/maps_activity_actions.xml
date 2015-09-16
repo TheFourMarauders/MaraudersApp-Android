@@ -10,12 +10,6 @@
     <group android:checkableBehavior="single">
         <item
             android:id="@+id/nav_first_fragment"
-            android:title="First" />
-        <item
-            android:id="@+id/nav_second_fragment"
-            android:title="Second" />
-        <item
-            android:id="@+id/nav_third_fragment"
-            android:title="Third" />
+            android:title="Settings" />
     </group>
 </menu>
