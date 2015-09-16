@@ -17,7 +17,7 @@
              which is used to tint widgets -->
         <item name="colorAccent">@color/colorAccent</item>
 
-        <item name="drawerArrowStyle">@style/DrawerArrowStyle</item>
+        <item name="drawerArrowStyle">@style/DrawerIconStyle</item>
 
         <item name="android:windowDrawsSystemBarBackgrounds">true</item>
         <item name="android:statusBarColor">@android:color/transparent</item>
@@ -25,10 +25,17 @@
 
     </style>
 
-    <style name="DrawerArrowStyle" parent="Widget.AppCompat.DrawerArrowToggle">
-        <!-- TODO(mjmaurer) mess with style -->
+    <!-- Needed to make the navigation drawer icon color -->
+    <style name="DrawerIconStyle" parent="Widget.AppCompat.DrawerArrowToggle">
         <item name="spinBars">true</item>
-        <item name="color">@android:color/black</item>
+        <item name="color">@color/colorPrimary_text</item>
+    </style>
+
+    <style name="ToolbarStyle" parent="AppTheme">
+        <item name="android:textColorPrimary">@color/colorPrimary_text</item>
+        <!-- Needed for popup menus -->
+        <item name="android:textColor">@color/colorMenuText</item>
+        <item name="android:textColorSecondary">@color/colorPrimary_text</item>
     </style>
 
 </resources>

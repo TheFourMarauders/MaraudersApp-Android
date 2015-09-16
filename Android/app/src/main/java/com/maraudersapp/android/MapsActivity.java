@@ -49,7 +49,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
 
         initDrawerView();
         if (mToolbar != null) {
-            mToolbar.setTitle("Navigation Drawer");
+            mToolbar.setTitle("Your History");
             setSupportActionBar(mToolbar);
         }
         initDrawer();
