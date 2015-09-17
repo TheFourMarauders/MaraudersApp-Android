@@ -1,4 +1,10 @@
 <resources>
     <string name="app_name">Android</string>
     <string name="title_activity_maps">Maurader\'s App</string>
+    <string name="yourself_item_name">Yourself</string>
+    <string name="friends_item_name">Friends</string>
+    <string name="groups_item_name">Groups</string>
+    <string name="incognito_item_name">Incognito</string>
+    <string name="settings_item_name">Settings</string>
+    <string name="logout_item_name">Log Out</string>
 </resources>

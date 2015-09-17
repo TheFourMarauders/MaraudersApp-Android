@@ -1,26 +1,14 @@
 package com.maraudersapp.android;
 
 import android.content.DialogInterface;
-import android.content.res.Configuration;
-import android.content.Intent;
-import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
-import android.support.v4.widget.DrawerLayout;
-import android.support.v7.app.ActionBarActivity;
-import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
-import android.view.LayoutInflater;
 import android.view.View;
-import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
-import android.view.View;
-import android.widget.ArrayAdapter;
-import android.widget.ListView;
-import android.widget.RelativeLayout;
 
 import com.cocosw.bottomsheet.BottomSheet;
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -36,20 +24,19 @@ import com.mikepenz.materialdrawer.DrawerBuilder;
 import com.mikepenz.materialdrawer.model.DividerDrawerItem;
 import com.mikepenz.materialdrawer.model.PrimaryDrawerItem;
 import com.mikepenz.materialdrawer.model.ProfileDrawerItem;
-import com.mikepenz.materialdrawer.model.SecondaryDrawerItem;
+import com.mikepenz.materialdrawer.model.ToggleDrawerItem;
 import com.mikepenz.materialdrawer.model.interfaces.IDrawerItem;
-import com.mikepenz.materialdrawer.model.interfaces.IProfile;
+
+import java.util.ArrayList;
 
 public class MapsActivity extends AppCompatActivity implements OnMapReadyCallback {
+
+    private static final String MAPS_ACTIVITY_TAG = "MAPS_TAG";
 
     private GoogleMap mMap;
     private Toolbar mToolbar;
     private Drawer mDrawer;
     private AccountHeader mHeader;
-
-    // TODO change this to some data structure
-    private String[] leftSliderData = {"Yourself", "Friends", "Groups", "Incognito", "Settings", "Log Out"};
-    private ArrayAdapter<String> mDrawerAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -76,7 +63,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                         new ProfileDrawerItem().withName("Michael Maurer")
                                 .withEmail("mjmaurer777@gmail.com")
                                 .withIcon(getResources().getDrawable(R.drawable.michael))
-            )
+                )
                 .build();
 
         mDrawer = new DrawerBuilder()
@@ -85,13 +72,11 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
             .withToolbar(mToolbar)
             .withTranslucentStatusBar(true)
             .withSelectedItem(-1) // So no default item is selected
-            .addDrawerItems(
-                    new PrimaryDrawerItem().withName(R.string.drawer_item_home).withIdentifier(1).withSelectable(false)
-            )
+            .withDrawerItems(DrawerItem.getAllItems())
             .withOnDrawerItemClickListener(new Drawer.OnDrawerItemClickListener() {
                 @Override
                 public boolean onItemClick(View view, int position, IDrawerItem drawerItem) {
-                    Log.i("Here", Integer.toString(position));
+                    DrawerItem.values()[position - 1].handleClick();
                     return true;
                 }
             })
@@ -150,5 +135,70 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         LatLng sydney = new LatLng(-34, 151);
         mMap.addMarker(new MarkerOptions().position(sydney).title("Marker in Sydney"));
         mMap.moveCamera(CameraUpdateFactory.newLatLng(sydney));
+    }
+
+    private enum DrawerItem {
+
+        YOURSELF(new PrimaryDrawerItem().withName(R.string.yourself_item_name).withIdentifier(1).withSelectable(false)) {
+
+            @Override
+            public void handleClick() {
+                Log.i(MAPS_ACTIVITY_TAG, "Yourself clicked");
+            }
+        },
+        FRIENDS(new PrimaryDrawerItem().withName(R.string.friends_item_name).withIdentifier(2).withSelectable(false)) {
+
+            @Override
+            public void handleClick() {
+                Log.i(MAPS_ACTIVITY_TAG, "Friends clicked");
+            }
+        },
+        GROUPS(new PrimaryDrawerItem().withName(R.string.groups_item_name).withIdentifier(3).withSelectable(false)) {
+            @Override
+            public void handleClick() {
+                Log.i(MAPS_ACTIVITY_TAG, "Groups clicked");
+            }
+        },
+        SEPARATE(new DividerDrawerItem()) {
+            @Override
+            public void handleClick() {}
+        },
+        INCOGNITO(new ToggleDrawerItem().withName(R.string.incognito_item_name).withIdentifier(4).withSelectable(false)) {
+
+            @Override
+            public void handleClick() {
+                Log.i(MAPS_ACTIVITY_TAG, "Incognito clicked");
+            }
+        },
+        SETTINGS(new PrimaryDrawerItem().withName(R.string.settings_item_name).withIdentifier(5).withSelectable(false)) {
+
+            @Override
+            public void handleClick() {
+                Log.i(MAPS_ACTIVITY_TAG, "Settings clicked");
+            }
+        },
+        LOGOUT(new PrimaryDrawerItem().withName(R.string.logout_item_name).withIdentifier(6).withSelectable(false)) {
+
+            @Override
+            public void handleClick() {
+                Log.i(MAPS_ACTIVITY_TAG, "Logout clicked");
+            }
+        };
+
+        private IDrawerItem drawerItem;
+
+        public abstract void handleClick();
+
+        DrawerItem(IDrawerItem drawerItem) {
+            this.drawerItem = drawerItem;
+        }
+
+        public static ArrayList<IDrawerItem> getAllItems() {
+            ArrayList<IDrawerItem> toReturn = new ArrayList<>();
+            for (DrawerItem item : values()) {
+                toReturn.add(item.drawerItem);
+            }
+            return toReturn;
+        }
     }
 }
