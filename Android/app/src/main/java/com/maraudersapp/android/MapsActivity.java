@@ -29,11 +29,18 @@ import com.mikepenz.materialdrawer.model.interfaces.IDrawerItem;
 
 import java.util.ArrayList;
 
+/**
+ * Main activity that displays the map that the users can interact with.
+ *
+ * Extends AppCompatActivity for Toolbar use.
+ */
 public class MapsActivity extends AppCompatActivity implements OnMapReadyCallback {
 
+    // Logging within this class.
     private static final String MAPS_ACTIVITY_TAG = "MAPS_TAG";
 
     private GoogleMap mMap;
+
     private Toolbar mToolbar;
     private Drawer mDrawer;
     private AccountHeader mHeader;
@@ -51,6 +58,10 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         mapFragment.getMapAsync(this);
     }
 
+    /**
+     * Uses MaterialDrawer (https://github.com/mikepenz/MaterialDrawer)
+     * to create a Navigation Drawer and Toolbar to host it.
+     */
     private void initToolbarAndDrawer() {
         mToolbar = (Toolbar) findViewById(R.id.toolbar);
         mToolbar.setTitle("Your History");
@@ -76,6 +87,8 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
             .withOnDrawerItemClickListener(new Drawer.OnDrawerItemClickListener() {
                 @Override
                 public boolean onItemClick(View view, int position, IDrawerItem drawerItem) {
+                    // DrawerItem position is exactly the order it is added,
+                    // so this is a clean way to handle clicks.
                     DrawerItem.values()[position - 1].handleClick();
                     return true;
                 }
@@ -94,6 +107,8 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.plus_button:
+                // Display "Create" dialog at the bottom of the screen.
+                // https://github.com/soarcn/BottomSheet
                 new BottomSheet.Builder(this).title("Create new...").sheet(R.menu.create).listener(new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
@@ -137,6 +152,13 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         mMap.moveCamera(CameraUpdateFactory.newLatLng(sydney));
     }
 
+    /**
+     * Structure for holding each item in the Navigation Drawer (left panel).
+     *
+     * Adding a new item to the drawer is as easy as adding a new enum instance here.
+     * Just make sure that the identifier is unique. Items are added in the order they are
+     * specified. handleClick will be called when the item is clicked in the UI.
+     */
     private enum DrawerItem {
 
         YOURSELF(new PrimaryDrawerItem().withName(R.string.yourself_item_name).withIdentifier(1).withSelectable(false)) {
@@ -185,14 +207,21 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
             }
         };
 
+        // Actual DrawerItem to be drawn.
         private IDrawerItem drawerItem;
 
+        /**
+         * Action to complete when the DrawerItem is clicked in the UI.
+         */
         public abstract void handleClick();
 
         DrawerItem(IDrawerItem drawerItem) {
             this.drawerItem = drawerItem;
         }
 
+        /**
+         * @return all DrawerItems' IDrawerItem (what is actually given to the API).
+         */
         public static ArrayList<IDrawerItem> getAllItems() {
             ArrayList<IDrawerItem> toReturn = new ArrayList<>();
             for (DrawerItem item : values()) {

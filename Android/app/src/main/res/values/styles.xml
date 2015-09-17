@@ -19,6 +19,7 @@
 
         <item name="drawerArrowStyle">@style/DrawerIconStyle</item>
 
+        <!-- Needed for full screen nav bar -->
         <item name="android:windowDrawsSystemBarBackgrounds">true</item>
         <item name="android:statusBarColor">@android:color/transparent</item>
         <item name="android:windowTranslucentStatus">true</item>
@@ -32,6 +33,7 @@
     </style>
 
     <style name="ToolbarStyle" parent="AppTheme">
+        <!-- Need to make icons appear white on Toolbar -->
         <item name="android:textColorPrimary">@color/colorPrimary_text</item>
         <!-- Needed for popup menus -->
         <item name="android:textColor">@color/colorMenuText</item>

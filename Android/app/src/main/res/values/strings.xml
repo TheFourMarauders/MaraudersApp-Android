@@ -1,6 +1,8 @@
 <resources>
-    <string name="app_name">Android</string>
+    <string name="app_name">Maurader\'s App</string>
     <string name="title_activity_maps">Maurader\'s App</string>
+
+    <!-- Names for DrawerItems in NavigationDrawer -->
     <string name="yourself_item_name">Yourself</string>
     <string name="friends_item_name">Friends</string>
     <string name="groups_item_name">Groups</string>
