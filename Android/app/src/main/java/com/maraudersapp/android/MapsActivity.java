@@ -10,6 +10,7 @@ import android.support.v7.app.ActionBarActivity;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.Gravity;
@@ -28,31 +29,34 @@ import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.mikepenz.materialdrawer.AccountHeader;
+import com.mikepenz.materialdrawer.AccountHeaderBuilder;
+import com.mikepenz.materialdrawer.Drawer;
+import com.mikepenz.materialdrawer.DrawerBuilder;
+import com.mikepenz.materialdrawer.model.DividerDrawerItem;
+import com.mikepenz.materialdrawer.model.PrimaryDrawerItem;
+import com.mikepenz.materialdrawer.model.ProfileDrawerItem;
+import com.mikepenz.materialdrawer.model.SecondaryDrawerItem;
+import com.mikepenz.materialdrawer.model.interfaces.IDrawerItem;
+import com.mikepenz.materialdrawer.model.interfaces.IProfile;
 
 public class MapsActivity extends AppCompatActivity implements OnMapReadyCallback {
 
     private GoogleMap mMap;
     private Toolbar mToolbar;
-    private DrawerLayout mDrawerLayout;
-    private ListView mDrawer;
-    private ActionBarDrawerToggle mDrawerToggle;
+    private Drawer mDrawer;
+    private AccountHeader mHeader;
 
     // TODO change this to some data structure
     private String[] leftSliderData = {"Yourself", "Friends", "Groups", "Incognito", "Settings", "Log Out"};
     private ArrayAdapter<String> mDrawerAdapter;
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_maps);
 
-        initDrawerView();
-        if (mToolbar != null) {
-            mToolbar.setTitle("Your History");
-            setSupportActionBar(mToolbar);
-        }
-        initDrawer();
+        initToolbarAndDrawer();
 
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
@@ -60,37 +64,49 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         mapFragment.getMapAsync(this);
     }
 
-    private void initDrawer() {
-        mDrawerToggle= new ActionBarDrawerToggle(this, mDrawerLayout,mToolbar, R.string.app_name, R.string.app_name);
-        mDrawerLayout.setDrawerListener(mDrawerToggle);
-        mDrawerLayout.setStatusBarBackgroundColor(getResources().getColor(R.color.colorPrimary));
-    }
-
-    private void initDrawerView() {
+    private void initToolbarAndDrawer() {
         mToolbar = (Toolbar) findViewById(R.id.toolbar);
-        mDrawer = (ListView) findViewById(R.id.left_drawer);
-        mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
-        // TODO not sure what the deal with this simple list item is
-        mDrawerAdapter=new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, leftSliderData);
-        mDrawer.setAdapter(mDrawerAdapter);
+        mToolbar.setTitle("Your History");
+        setSupportActionBar(mToolbar);
 
-        // TODO dynamic images. See http://velmuruganandroidcoding.blogspot.com/2014/09/navigation-drawer-with-header-in-android.html
-        View header=getLayoutInflater().inflate(R.layout.navigation_drawer_header, null);
-        mDrawer.addHeaderView(header);
+        mHeader = new AccountHeaderBuilder()
+                .withActivity(this)
+                .withHeaderBackground(R.drawable.navigation_header)
+                .addProfiles(
+                        new ProfileDrawerItem().withName("Michael Maurer")
+                                .withEmail("mjmaurer777@gmail.com")
+                                .withIcon(getResources().getDrawable(R.drawable.michael))
+            )
+                .build();
+
+        mDrawer = new DrawerBuilder()
+            .withActivity(this)
+            .withAccountHeader(mHeader)
+            .withToolbar(mToolbar)
+            .withTranslucentStatusBar(true)
+            .withSelectedItem(-1) // So no default item is selected
+            .addDrawerItems(
+                    new PrimaryDrawerItem().withName(R.string.drawer_item_home).withIdentifier(1).withSelectable(false)
+            )
+            .withOnDrawerItemClickListener(new Drawer.OnDrawerItemClickListener() {
+                @Override
+                public boolean onItemClick(View view, int position, IDrawerItem drawerItem) {
+                    Log.i("Here", Integer.toString(position));
+                    return true;
+                }
+            })
+            .build();
     }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = new MenuInflater(this);
-        inflater.inflate(R.menu.maps_activity_actions,menu);
+        inflater.inflate(R.menu.maps_activity_actions, menu);
         return true;
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        if (mDrawerToggle.onOptionsItemSelected(item)) {
-            return true;
-        }
         switch (item.getItemId()) {
             case R.id.plus_button:
                 new BottomSheet.Builder(this).title("Create new...").sheet(R.menu.create).listener(new DialogInterface.OnClickListener() {
@@ -107,24 +123,13 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     }
 
     @Override
-    protected void onPostCreate(Bundle savedInstanceState) {
-        super.onPostCreate(savedInstanceState);
-        mDrawerToggle.syncState();
-    }
-
-    @Override
-    public void onConfigurationChanged(Configuration newConfig) {
-        super.onConfigurationChanged(newConfig);
-        mDrawerToggle.onConfigurationChanged(newConfig);
-    }
-
-    @Override
     public void onBackPressed() {
-        if(mDrawerLayout.isDrawerOpen(Gravity.START| Gravity.LEFT)){
-            mDrawerLayout.closeDrawers();
-            return;
+        //handle the back press :D close the drawer first and if the drawer is closed close the activity
+        if (mDrawer != null && mDrawer.isDrawerOpen()) {
+            mDrawer.closeDrawer();
+        } else {
+            super.onBackPressed();
         }
-        super.onBackPressed();
     }
 
 
