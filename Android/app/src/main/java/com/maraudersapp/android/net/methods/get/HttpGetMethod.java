@@ -1,13 +1,13 @@
-package com.maraudersapp.android.net.methods;
+package com.maraudersapp.android.net.methods.get;
 
 /**
- * See HttpTask for proper use.
+ * See HttpGetTask for proper use.
  *
- * Represents a HttpMethod that is available from the Maurader's App server.
+ * Represents a HttpGetMethod that is available from the Maurader's App server.
  *
  * The type parameter is a POJO (ideally) representation of the server response.
  */
-public interface HttpMethod<T> {
+public interface HttpGetMethod<T> {
 
     // TODO update
     public static final String BASE_SERVICE_URL = "SOME_URL/api/services/";
@@ -25,9 +25,4 @@ public interface HttpMethod<T> {
      * Guaranteed to be valid JSON.
      */
     T parseJsonResult(String json);
-
-    /**
-     * HTTP method type (GET, PUT, POST, ...)
-     */
-    String getType();
 }

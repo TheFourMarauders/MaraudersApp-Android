@@ -2,6 +2,9 @@ package com.maraudersapp.android.net;
 
 public final class HttpConstants {
 
+    // TODO update
+    public static final String BASE_SERVICE_URL = "SOME_URL/api/services/";
+
     // Amount of time before the HTTP will timeout from reading
     public static final int READ_TIMEOUT = 10000;
 

@@ -1,12 +1,12 @@
 package com.maraudersapp.android.net;
 
 /**
- * See HttpTask for proper use.
+ * See HttpGetTask for proper use.
  */
 public interface HttpCallback<T> {
 
     /**
-     * Called when the HttpTask returns with the response
+     * Called when the HttpGetTask returns with the response
      */
     void handleSuccess(T t);
 
