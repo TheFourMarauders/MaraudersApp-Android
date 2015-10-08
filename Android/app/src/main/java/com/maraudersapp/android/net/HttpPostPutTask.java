@@ -72,7 +72,7 @@ public class HttpPostPutTask extends AsyncTask<HttpPostPutMethod, Void, HttpResp
         HttpURLConnection conn = (HttpURLConnection) url.openConnection();
         // TODO set chunked streaming for when we know the length
 
-        conn.setConnectTimeout(10000);
+        conn.setConnectTimeout(HttpConstants.CONNECT_TIMEOUT);
 
         conn.setRequestMethod(method.getType());
         conn.setDoInput(true);
