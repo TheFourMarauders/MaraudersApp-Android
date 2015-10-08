@@ -62,18 +62,32 @@ public class HttpPostPutTask extends AsyncTask<HttpPostPutMethod, Void, String> 
         HttpURLConnection conn = (HttpURLConnection) url.openConnection();
         // TODO set chunked streaming for when we know the length
 
+        Log.i(HttpConstants.LOG_TAG, url.toString());
+        conn.setConnectTimeout(20000);
+
         conn.setRequestMethod(method.getType());
         conn.setDoInput(true);
-        conn.setDoOutput(true);
+        if ("POST".equals(method.getType())) {
+            conn.setDoOutput(true);
+        }
         conn.setRequestProperty("Content-Type", "application/json");
         conn.setRequestProperty("Accept", "application/json");
+        conn.setRequestProperty("Authorization", "Basic bWptYXVyZXI6cGFzcw==");
 
         try (BufferedWriter wr = new BufferedWriter(new OutputStreamWriter(conn.getOutputStream(), "UTF-8"))) {
+            Log.i(HttpConstants.LOG_TAG, method.toJson());
             wr.write(method.toJson());
             wr.flush();
         }
 
         int response = conn.getResponseCode();
+        Log.i(HttpConstants.LOG_TAG, "Response code: " + response);
+            
+        if (response != HttpConstants.GOOD_RESPONSE) {
+            Log.w(this.getClass().getName(), "Bad response. Code: " + response + ". Message: "
+                    + method.toJson() + ". URL attempt: " + method.getPath());
+            return null;
+        }
 
         StringBuilder sb = new StringBuilder();
         try (InputStream is = conn.getInputStream()) {
@@ -87,12 +101,6 @@ public class HttpPostPutTask extends AsyncTask<HttpPostPutMethod, Void, String> 
             conn.disconnect();
         }
 
-        if (response != HttpConstants.GOOD_RESPONSE) {
-            Log.w(this.getClass().getName(), "Bad response. Code: " + response + ". Message: "
-                    + method.toJson() + ". URL attempt: " + method.getPath());
-            return null;
-        } else {
-            return sb.toString();
-        }
+        return sb.toString();
     }
 }
