@@ -82,8 +82,9 @@ public  final class LocationUpdaterService extends Service implements LocationLi
             }
 
             @Override
-            public void handleFailure() {
-                Log.i(LocationConstants.LOG_TAG, "Location send not successful");
+            public void handleFailure(int responseCode, String errorMessage) {
+                Log.i(LocationConstants.LOG_TAG, "Location send not successful. Code: " + responseCode
+                        + ". Message: " + errorMessage);
                 onSendingFinished();
             }
         }).execute(new PutUserLocation("mjmaurer", location));

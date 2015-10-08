@@ -2,6 +2,7 @@ package com.maraudersapp.android.net;
 
 import android.os.AsyncTask;
 import android.util.Log;
+import android.util.Pair;
 
 import com.maraudersapp.android.net.methods.get.HttpGetMethod;
 import com.maraudersapp.android.net.methods.post_put.HttpPostPutMethod;
@@ -25,7 +26,7 @@ import java.net.URL;
  * new HttpPostPutTask(new HttpCallback\<String\>(){}).execute(some HttpPostPutMethod class
  *      from .net.methods.post_put)
  */
-public class HttpPostPutTask extends AsyncTask<HttpPostPutMethod, Void, String> {
+public class HttpPostPutTask extends AsyncTask<HttpPostPutMethod, Void, HttpResponse<String>> {
 
     private final HttpCallback<String> callback;
 
@@ -34,36 +35,44 @@ public class HttpPostPutTask extends AsyncTask<HttpPostPutMethod, Void, String> 
     }
 
     @Override
-    protected String doInBackground(HttpPostPutMethod... params) {
+    protected HttpResponse<String> doInBackground(HttpPostPutMethod... params) {
         HttpPostPutMethod method = params[0];
         try {
-            return uploadToUrl(method);
+            Pair<Integer, String> result = uploadToUrl(method);
+            if (result.first == HttpConstants.GOOD_RESPONSE) {
+                Log.w(this.getClass().getName(), "Bad response. Code: " + result.first + ". Message: "
+                        + result.second + ". URL attempt: " + method.getPath());
+                return new HttpResponse<String>(result.first, result.second);
+            } else {
+                return new HttpResponse<String>(result.second);
+            }
         } catch (IOException e){
             Log.w(this.getClass().getName(), e);
-            return null;
+            return new HttpResponse<String>(867, e.getMessage());
         }
     }
 
     @Override
-    protected void onPostExecute(String result) {
-        if (result == null) {
-            callback.handleFailure();
+    protected void onPostExecute(HttpResponse<String> result) {
+        if (result.isError()) {
+            callback.handleFailure(result.getErrorCode(), result.getErrorMessage());
         } else {
-            callback.handleSuccess(result);
+            callback.handleSuccess(result.getResponse());
         }
     }
 
     /**
      * Uploads JSON from HttpPostPutMethod to server
+     *
+     * Returns Pair\<Reponse code, response\>
      */
-    private String uploadToUrl(HttpPostPutMethod method) throws IOException {
+    private Pair<Integer, String> uploadToUrl(HttpPostPutMethod method) throws IOException {
         URL url = new URL(method.getPath());
         // TODO mock out httpURLConnection and a provider to make testing easier
         HttpURLConnection conn = (HttpURLConnection) url.openConnection();
         // TODO set chunked streaming for when we know the length
 
-        Log.i(HttpConstants.LOG_TAG, url.toString());
-        conn.setConnectTimeout(20000);
+        conn.setConnectTimeout(10000);
 
         conn.setRequestMethod(method.getType());
         conn.setDoInput(true);
@@ -81,16 +90,10 @@ public class HttpPostPutTask extends AsyncTask<HttpPostPutMethod, Void, String> 
         }
 
         int response = conn.getResponseCode();
-        Log.i(HttpConstants.LOG_TAG, "Response code: " + response);
-            
-        if (response != HttpConstants.GOOD_RESPONSE) {
-            Log.w(this.getClass().getName(), "Bad response. Code: " + response + ". Message: "
-                    + method.toJson() + ". URL attempt: " + method.getPath());
-            return null;
-        }
 
         StringBuilder sb = new StringBuilder();
-        try (InputStream is = conn.getInputStream()) {
+        try (InputStream is = response == HttpConstants.GOOD_RESPONSE
+                ? conn.getInputStream() : conn.getErrorStream()) {
             BufferedReader br = new BufferedReader(new InputStreamReader(is));
             String line;
             while ((line = br.readLine()) != null) {
@@ -101,6 +104,6 @@ public class HttpPostPutTask extends AsyncTask<HttpPostPutMethod, Void, String> 
             conn.disconnect();
         }
 
-        return sb.toString();
+        return Pair.create(response, sb.toString());
     }
 }

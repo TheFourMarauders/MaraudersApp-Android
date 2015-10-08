@@ -33,7 +33,7 @@ public final class ConnectivityReceiver extends BroadcastReceiver {
             // schedule service for every minute
             alarmManager.setInexactRepeating(AlarmManager.ELAPSED_REALTIME_WAKEUP,
                     SystemClock.elapsedRealtime(),
-                    15 * 1000, wakeupIntent);
+                    LocationConstants.GPS_INTERVAL, wakeupIntent);
         } else {
             alarmManager.cancel(wakeupIntent);
         }

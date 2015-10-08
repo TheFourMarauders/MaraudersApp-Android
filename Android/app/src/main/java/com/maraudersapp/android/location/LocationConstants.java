@@ -6,4 +6,6 @@ package com.maraudersapp.android.location;
 public final class LocationConstants {
 
     public static final String LOG_TAG = "android.Location";
+
+    public static final int GPS_INTERVAL = 15 * 1000; // In milleseconds
 }
