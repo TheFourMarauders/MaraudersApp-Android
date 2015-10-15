@@ -67,6 +67,22 @@
             </intent-filter>
         </receiver>
 
+        <service
+            android:enabled="true"
+            android:name=".location.LocationUpdaterService">
+            <intent-filter>
+                <action
+                    android:name = "com.maraudersapp.android.location.LocationUpdaterService">
+                </action>
+            </intent-filter>
+        </service>
+
+        <receiver android:name=".location.ConnectivityReceiver" android:enabled="true">
+            <intent-filter>
+                <action android:name="android.net.conn.CONNECTIVITY_CHANGE" />
+            </intent-filter>
+        </receiver>
+
     </application>
 
 </manifest>
