@@ -1,7 +1,12 @@
 package com.maraudersapp.android;
 
+import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.preference.Preference;
+import android.preference.PreferenceManager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
@@ -38,6 +43,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
 
     // Logging within this class.
     private static final String MAPS_ACTIVITY_TAG = "MAPS_TAG";
+
 
     private GoogleMap mMap;
 
@@ -89,6 +95,15 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                 public boolean onItemClick(View view, int position, IDrawerItem drawerItem) {
                     // DrawerItem position is exactly the order it is added,
                     // so this is a clean way to handle clicks.
+
+                    System.out.println(position);
+                    if(position == 7) {
+                        Intent i = new Intent(view.getContext(), LoginActivity.class);
+                        i.putExtra("nullify", true);
+                        view.getContext().startActivity(i);
+                    }
+
+
                     DrawerItem.values()[position - 1].handleClick();
                     return true;
                 }
@@ -128,7 +143,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         if (mDrawer != null && mDrawer.isDrawerOpen()) {
             mDrawer.closeDrawer();
         } else {
-            super.onBackPressed();
+            moveTaskToBack(true);
         }
     }
 
@@ -200,9 +215,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         LOGOUT(new PrimaryDrawerItem().withName(R.string.logout_item_name).withIdentifier(6).withSelectable(false)) {
 
             @Override
-            public void handleClick() {
-                Log.i(MAPS_ACTIVITY_TAG, "Logout clicked");
-            }
+            public void handleClick() { Log.i(MAPS_ACTIVITY_TAG, "Logout clicked"); }
         };
 
         // Actual DrawerItem to be drawn.
