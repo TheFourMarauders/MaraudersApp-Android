@@ -12,6 +12,8 @@ public interface HttpCallback<T> {
 
     /**
      * Called when a call to the server fails
+     *
+     * 867: This means that the page could not be parsed on Android's side
      */
-    void handleFailure();
+    void handleFailure(int errorCode, String message);
 }

@@ -2,6 +2,7 @@ package com.maraudersapp.android.net;
 
 import android.os.AsyncTask;
 import android.util.Log;
+import android.util.Pair;
 
 import com.maraudersapp.android.net.methods.get.HttpGetMethod;
 
@@ -26,7 +27,7 @@ import java.net.URL;
  *
  * @param <T> The type of HttpGetMethod and HttpCallback desired.
  */
-public class HttpGetTask<T> extends AsyncTask<HttpGetMethod<T>, Void, T> {
+public class HttpGetTask<T> extends AsyncTask<HttpGetMethod<T>, Void, HttpResponse<T>> {
 
     private final HttpCallback<T> callback;
 
@@ -35,33 +36,38 @@ public class HttpGetTask<T> extends AsyncTask<HttpGetMethod<T>, Void, T> {
     }
 
     @Override
-    protected T doInBackground(HttpGetMethod<T>... params) {
+    protected HttpResponse<T> doInBackground(HttpGetMethod<T>... params) {
         HttpGetMethod<T> method = params[0];
         try {
-            String result = downloadUrl(method);
-            if (result == null) {
-                return null;
+            Pair<Integer, String> result = downloadUrl(method);
+            if (result.first == HttpConstants.GOOD_RESPONSE) {
+                Log.w(this.getClass().getName(), "Bad response. Code: " + result.first + ". Message: "
+                        + result.second + ". URL attempt: " + method.getPath());
+                return new HttpResponse<T>(result.first, result.second);
+            } else {
+                return new HttpResponse<T>(method.parseJsonResult(result.second));
             }
-            return method.parseJsonResult(result);
         } catch (IOException e){
             Log.w(this.getClass().getName(), e);
-            return null;
+            return new HttpResponse<T>(867, e.getMessage());
         }
     }
 
     @Override
-    protected void onPostExecute(T result) {
-        if (result == null) {
-            callback.handleFailure();
+    protected void onPostExecute(HttpResponse<T> result) {
+        if (result.isError()) {
+            callback.handleFailure(result.getErrorCode(), result.getErrorMessage());
         } else {
-            callback.handleSuccess(result);
+            callback.handleSuccess(result.getResponse());
         }
     }
 
     /**
      * Reads raw JSON response from server.
+     *
+     * Pair\<responseCode, response\>
      */
-    private String downloadUrl(HttpGetMethod<T> method) throws IOException {
+    private Pair<Integer, String> downloadUrl(HttpGetMethod<T> method) throws IOException {
         URL url = new URL(method.getPath());
         // TODO mock out httpURLConnection and a provider to make testing easier
         HttpURLConnection conn = (HttpURLConnection) url.openConnection();
@@ -74,7 +80,8 @@ public class HttpGetTask<T> extends AsyncTask<HttpGetMethod<T>, Void, T> {
         int response = conn.getResponseCode();
 
         StringBuilder sb = new StringBuilder();
-        try (InputStream is = conn.getInputStream()) {
+        try (InputStream is = response == HttpConstants.GOOD_RESPONSE
+                ? conn.getInputStream() : conn.getErrorStream()) {
             BufferedReader br = new BufferedReader(new InputStreamReader(is));
             String line;
             while ((line = br.readLine()) != null) {
@@ -85,12 +92,6 @@ public class HttpGetTask<T> extends AsyncTask<HttpGetMethod<T>, Void, T> {
             conn.disconnect();
         }
 
-        if (response != HttpConstants.GOOD_RESPONSE) {
-            Log.w(this.getClass().getName(), "Bad response. Code: " + response + ". Message: "
-                + sb.toString() + ". URL attempt: " + method.getPath());
-            return null;
-        } else {
-            return sb.toString();
-        }
+        return Pair.create(response, sb.toString());
     }
 }

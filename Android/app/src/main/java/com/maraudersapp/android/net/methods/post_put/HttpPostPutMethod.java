@@ -7,7 +7,7 @@ package com.maraudersapp.android.net.methods.post_put;
  *
  * Information to be sent should be entered through constructor (most likely as a POJO or list or POJOs)
  */
-public interface HttpPostPutMethod<T> {
+public interface HttpPostPutMethod {
 
     /**
      * The path that the service is located at.
