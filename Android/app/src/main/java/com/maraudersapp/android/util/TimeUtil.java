@@ -19,4 +19,26 @@ public final class TimeUtil {
         return df.format(new Date());
     }
 
+    public static Date parseDate(String date) {
+        TimeZone tz = TimeZone.getTimeZone("UTC");
+        DateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:ss:mm'Z'");
+        df.setTimeZone(tz);
+        Date d;
+        try {
+            d = df.parse(date);
+        }catch (java.text.ParseException ex){
+            d = null;
+        }
+        return d;
+    }
+
+    public static String dateToString(Date d) {
+        TimeZone tz = TimeZone.getTimeZone("UTC");
+        DateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:ss:mm'Z'");
+        df.setTimeZone(tz);
+        return df.format(d);
+    }
+
+
+
 }
