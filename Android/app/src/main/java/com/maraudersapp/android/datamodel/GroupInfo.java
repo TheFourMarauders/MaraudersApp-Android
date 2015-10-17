@@ -35,18 +35,13 @@ public class GroupInfo {
 
         GroupInfo groupInfo = (GroupInfo) o;
 
-        if (!getMembers().equals(groupInfo.getMembers())) return false;
-        if (!getId().equals(groupInfo.getId())) return false;
-        return getName().equals(groupInfo.getName());
+        return getId().equals(groupInfo.getId());
 
     }
 
     @Override
     public int hashCode() {
-        int result = getMembers().hashCode();
-        result = 31 * result + getId().hashCode();
-        result = 31 * result + getName().hashCode();
-        return result;
+        return getId().hashCode();
     }
 
     @Override

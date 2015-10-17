@@ -33,18 +33,13 @@ public class UserInfo {
 
         UserInfo userInfo = (UserInfo) o;
 
-        if (!getUsername().equals(userInfo.getUsername())) return false;
-        if (!getFirstName().equals(userInfo.getFirstName())) return false;
-        return getLastName().equals(userInfo.getLastName());
+        return getUsername().equals(userInfo.getUsername());
 
     }
 
     @Override
     public int hashCode() {
-        int result = getUsername().hashCode();
-        result = 31 * result + getFirstName().hashCode();
-        result = 31 * result + getLastName().hashCode();
-        return result;
+        return getUsername().hashCode();
     }
 
     @Override
