@@ -71,7 +71,7 @@
 
   <profiles>
     <profile>
-      <id>debug</id>
+      <_id>debug</_id>
       <activation>
         <activeByDefault>true</activeByDefault>
         <property>
@@ -87,7 +87,7 @@
             <version>2.18.1</version>
             <executions>
               <execution>
-                <id>default-test</id>
+                <_id>default-test</_id>
                 <configuration>
                   <argLine>${surefireArgLine}</argLine>
                 </configuration>
@@ -102,7 +102,7 @@
             <version>0.7.2.201409121644</version>
             <executions>
               <execution>
-                <id>pre-unit-test</id>
+                <_id>pre-unit-test</_id>
                 <goals>
                   <goal>prepare-agent</goal>
                 </goals>
@@ -112,7 +112,7 @@
                 </configuration>
               </execution>
               <execution>
-                <id>jacoco-report</id>
+                <_id>jacoco-report</_id>
                 <phase>post-integration-test</phase>
                 <goals>
                   <goal>report</goal>

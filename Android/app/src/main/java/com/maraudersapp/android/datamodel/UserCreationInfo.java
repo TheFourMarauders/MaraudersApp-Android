@@ -1,15 +1,20 @@
 package com.maraudersapp.android.datamodel;
 
-import org.json.JSONException;
-import org.json.JSONObject;
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 /**
  * Created by joe on 10/16/15.
  */
-public class UserCreationInfo implements JsonSchema {
+public class UserCreationInfo {
     private String username, password, firstName, lastName;
 
-    public UserCreationInfo(String username, String password, String firstName, String lastName) {
+    @JsonCreator
+    public UserCreationInfo(
+            @JsonProperty("username") String username,
+            @JsonProperty("password") String password,
+            @JsonProperty("firstName") String firstName,
+            @JsonProperty("lastName") String lastName) {
         this.username = username;
         this.password = password;
         this.firstName = firstName;
@@ -30,20 +35,6 @@ public class UserCreationInfo implements JsonSchema {
 
     public String getLastName() {
         return lastName;
-    }
-
-    @Override
-    public String writeToJson() {
-        JSONObject json = new JSONObject();
-        try {
-            json.put("username", username);
-            json.put("password", password);
-            json.put("firstName", firstName);
-            json.put("lastName", lastName);
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-        return json.toString();
     }
 
     @Override

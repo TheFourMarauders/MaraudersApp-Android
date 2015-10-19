@@ -46,8 +46,8 @@ public class ServerConfig {
         return SERVICES + "/user/" + username + "/locations" + queryParams(start, end);
     }
 
-    public String getGroupCreationUrl() {
-        return SERVICES + "/group/create";
+    public String getGroupCreationUrl(String groupName) {
+        return SERVICES + "/group/create" + "?groupname=" + groupName;
     }
 
     public String getUserGroupsUrl(String username) {

@@ -1,7 +1,7 @@
 <LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/main_parent_view"
+    android:_id="@+_id/main_parent_view"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical">
@@ -13,6 +13,6 @@
         xmlns:tools="http://schemas.android.com/tools"
         xmlns:map="http://schemas.android.com/apk/res-auto" android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:id="@+id/map" tools:context=".MapsActivity"
+        android:_id="@+_id/map" tools:context=".MapsActivity"
         android:name="com.google.android.gms.maps.SupportMapFragment"/>
 </LinearLayout>

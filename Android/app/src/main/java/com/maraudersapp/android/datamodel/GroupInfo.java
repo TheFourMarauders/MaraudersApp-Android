@@ -1,5 +1,8 @@
 package com.maraudersapp.android.datamodel;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import java.util.Set;
 
 /**
@@ -7,12 +10,16 @@ import java.util.Set;
  */
 public class GroupInfo {
     private Set<String> members;
-    private String id;
+    private String _id;
     private String name;
 
-    public GroupInfo(Set<String> members, String id, String name) {
+    @JsonCreator
+    public GroupInfo(
+            @JsonProperty("members") Set<String> members,
+            @JsonProperty("_id") String _id,
+            @JsonProperty("name") String name) {
         this.members = members;
-        this.id = id;
+        this._id = _id;
         this.name = name;
     }
 
@@ -20,8 +27,8 @@ public class GroupInfo {
         return members;
     }
 
-    public String getId() {
-        return id;
+    public String get_id() {
+        return _id;
     }
 
     public String getName() {
@@ -35,20 +42,20 @@ public class GroupInfo {
 
         GroupInfo groupInfo = (GroupInfo) o;
 
-        return getId().equals(groupInfo.getId());
+        return get_id().equals(groupInfo.get_id());
 
     }
 
     @Override
     public int hashCode() {
-        return getId().hashCode();
+        return get_id().hashCode();
     }
 
     @Override
     public String toString() {
         return "GroupInfo{" +
                 "members=" + members +
-                ", id='" + id + '\'' +
+                ", _id='" + _id + '\'' +
                 ", name='" + name + '\'' +
                 '}';
     }

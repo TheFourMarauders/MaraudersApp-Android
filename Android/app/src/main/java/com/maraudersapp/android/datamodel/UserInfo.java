@@ -1,5 +1,8 @@
 package com.maraudersapp.android.datamodel;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 /**
  * Created by Matthew on 10/16/2015.
  */
@@ -8,7 +11,11 @@ public class UserInfo {
     private String firstName;
     private String lastName;
 
-    public UserInfo(String username, String firstName, String lastName) {
+    @JsonCreator
+    public UserInfo(
+            @JsonProperty("username") String username,
+            @JsonProperty("firstName") String firstName,
+            @JsonProperty("lastName") String lastName) {
         this.username = username;
         this.firstName = firstName;
         this.lastName = lastName;

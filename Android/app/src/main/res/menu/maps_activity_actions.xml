@@ -3,13 +3,13 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
     <!-- TODO change this. -->
     <item
-        android:id="@+id/plus_button"
+        android:_id="@+_id/plus_button"
         android:icon="@mipmap/ic_launcher_plus_button"
         android:title="Button"
         android:showAsAction="ifRoom"/>
     <group android:checkableBehavior="single">
         <item
-            android:id="@+id/nav_first_fragment"
+            android:_id="@+_id/nav_first_fragment"
             android:title="Settings" />
     </group>
 </menu>

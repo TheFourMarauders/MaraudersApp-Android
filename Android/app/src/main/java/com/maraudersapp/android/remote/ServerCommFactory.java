@@ -8,6 +8,7 @@ import android.content.Context;
 public class ServerCommFactory {
 
     public ServerComm build(Context context) {
-        return new HttpVolleyDispatcher(context, new ServerConfig("http://maraudersapp.cloudapp.net", 27380));
+        return new HttpVolleyDispatcher(
+                context, new ServerConfig("http://maraudersapp.cloudapp.net", 27380));
     }
 }
