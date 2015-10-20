@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
     <item
-        android:_id="@+_id/add_friend"
+        android:id="@+id/add_friend"
         android:title="Add Friend"
         android:icon="@mipmap/ic_launcher"
         />
     <item
-        android:_id="@+_id/create_group"
+        android:id="@+id/create_group"
         android:title="Create a Group"
         android:icon="@mipmap/ic_launcher"
         />

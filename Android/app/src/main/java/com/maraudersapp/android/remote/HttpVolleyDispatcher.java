@@ -1,7 +1,9 @@
 package com.maraudersapp.android.remote;
 
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.location.Location;
+import android.util.Base64;
 import android.util.Log;
 
 import com.android.volley.AuthFailureError;
@@ -17,6 +19,7 @@ import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.android.gms.auth.api.Auth;
+import com.maraudersapp.android.LoginActivity;
 import com.maraudersapp.android.datamodel.GroupInfo;
 import com.maraudersapp.android.datamodel.LocationInfo;
 import com.maraudersapp.android.datamodel.UserCreationInfo;
@@ -161,7 +164,7 @@ public class HttpVolleyDispatcher implements ServerComm {
         ObjectMapper mapper = new ObjectMapper();
         JavaType stringType = mapper.getTypeFactory().constructType(String.class);
         JavaType jt = mapper.getTypeFactory().constructCollectionType(ArrayList.class, LocationInfo.class);
-        
+
         GetRequest<Map<String, List<LocationInfo>>> req = new GetRequest<>(callback,
                 conf.getGroupLocationsUrl(groupId, TimeUtil.dateToString(start), TimeUtil.dateToString(end)),
                 mapper.getTypeFactory().constructMapType(HashMap.class, stringType, jt));
@@ -289,13 +292,22 @@ public class HttpVolleyDispatcher implements ServerComm {
         }
     }
 
-    private static void addAuth(Map<String, String> headers) {
+    private void addAuth(Map<String, String> headers) {
         //TODO
+        SharedPreferences authPrefs = context.getSharedPreferences(LoginActivity.LOGIN_PREFS_NAME, LoginActivity.MODE_PRIVATE);
+        String username = authPrefs.getString("username", null);
+        String password = authPrefs.getString("password", null);
         StringBuilder basicAuth = new StringBuilder();
-        headers.put("Authorization", basicAuth.toString());
-    }
-
-    private static String getUsername() {
-        return "";
+        basicAuth.append(username);
+        basicAuth.append(":");
+        basicAuth.append(password);
+        try {
+            byte[] data = basicAuth.toString().getBytes("UTF-8");
+            String base64Encoded = Base64.encodeToString(data, Base64.DEFAULT);
+            String authToken = "Basic " + base64Encoded;
+            headers.put("Authorization", authToken);
+        } catch (UnsupportedEncodingException e) {
+            Log.d("Volley", e.toString());
+        }
     }
 }
