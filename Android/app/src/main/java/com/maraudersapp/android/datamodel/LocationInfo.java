@@ -1,5 +1,7 @@
 package com.maraudersapp.android.datamodel;
 
+import android.location.Location;
+
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.maraudersapp.android.util.TimeUtil;
@@ -25,6 +27,10 @@ public class LocationInfo {
 
     public LocationInfo(double latitude, double longitude, Date time) {
         this(latitude, longitude, TimeUtil.dateToString(time));
+    }
+
+    public LocationInfo(Location l) {
+        this(l.getLatitude(), l.getLongitude(), TimeUtil.getCurrentTime());
     }
 
     public double getLatitude() {

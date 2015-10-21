@@ -11,9 +11,15 @@ import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.maraudersapp.android.datamodel.UserInfo;
 import com.maraudersapp.android.net.HttpCallback;
 import com.maraudersapp.android.net.HttpPostPutTask;
 import com.maraudersapp.android.net.methods.post_put.PutUserNamePass;
+import com.maraudersapp.android.remote.RemoteCallback;
+import com.maraudersapp.android.remote.ServerComm;
+import com.maraudersapp.android.remote.ServerCommFactory;
+
+import java.util.Set;
 
 import butterknife.ButterKnife;
 import butterknife.InjectView;
@@ -28,6 +34,7 @@ public class LoginActivity extends AppCompatActivity {
     boolean mustNullify = false;
     boolean isInitial = true;
     boolean isPreferencesNull = false;
+    ServerComm remote;
 
     @InjectView(R.id.input_username_login) EditText usernameText;
     @InjectView(R.id.input_password_login) EditText passwordText;
@@ -67,6 +74,8 @@ public class LoginActivity extends AppCompatActivity {
                 startActivityForResult(intent, REQUEST_SIGNUP);
             }
         });
+
+        remote = new ServerCommFactory().build(getApplicationContext());
     }
 
     public void login() {
@@ -79,10 +88,26 @@ public class LoginActivity extends AppCompatActivity {
 
         String username = usernameText.getText().toString();
         String password = passwordText.getText().toString();
+        putCredentials();
 
         // TODO: Authentication login
 
-        onLoginSuccess(); //Put in handle success
+        Log.d("LOGIN", "Checking login");
+        remote.getFriendsFor(username, new RemoteCallback<Set<UserInfo>>() {
+            @Override
+            public void onSuccess(Set<UserInfo> response) {
+                Log.d("LOGIN_SUCCESS", response.toString());
+                onLoginSuccess();
+            }
+
+            @Override
+            public void onFailure(int errorCode, String message) {
+                Log.d("LOGIN_FAILURE", errorCode + message);
+                onLoginFailed();
+            }
+        });
+
+        //onLoginSuccess(); //Put in handle success
   /*
         new HttpPostPutTask(new HttpCallback<String>() {
             @Override
@@ -118,7 +143,6 @@ public class LoginActivity extends AppCompatActivity {
     }
 
     public void onLoginSuccess() {
-        putCredentials();
         if(!mustNullify || !isInitial) {
             Toast.makeText(getBaseContext(), "Login Successful!", Toast.LENGTH_LONG).show();
         }
@@ -128,6 +152,7 @@ public class LoginActivity extends AppCompatActivity {
     }
 
     public void onLoginFailed() {
+        nullifyPreferences();
         if(!mustNullify || !isInitial) {
             Toast.makeText(getBaseContext(), "Login failed", Toast.LENGTH_LONG).show();
         }
