@@ -24,6 +24,7 @@ import com.maraudersapp.android.datamodel.GroupInfo;
 import com.maraudersapp.android.datamodel.LocationInfo;
 import com.maraudersapp.android.datamodel.UserCreationInfo;
 import com.maraudersapp.android.datamodel.UserInfo;
+import com.maraudersapp.android.storage.SharedPrefsUserAccessor;
 import com.maraudersapp.android.util.TimeUtil;
 
 import java.io.IOException;
@@ -293,10 +294,10 @@ public class HttpVolleyDispatcher implements ServerComm {
     }
 
     private void addAuth(Map<String, String> headers) {
-        //TODO
-        SharedPreferences authPrefs = context.getSharedPreferences(LoginActivity.LOGIN_PREFS_NAME, LoginActivity.MODE_PRIVATE);
-        String username = authPrefs.getString("username", null);
-        String password = authPrefs.getString("password", null);
+        SharedPrefsUserAccessor storage = new SharedPrefsUserAccessor(context);
+        String username = storage.getUsername();
+        String password = storage.getPassword();
+
         StringBuilder basicAuth = new StringBuilder();
         basicAuth.append(username);
         basicAuth.append(":");

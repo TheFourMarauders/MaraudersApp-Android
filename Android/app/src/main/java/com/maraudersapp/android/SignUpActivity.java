@@ -1,8 +1,6 @@
 package com.maraudersapp.android;
 
-import android.app.ProgressDialog;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
@@ -10,6 +8,12 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import com.maraudersapp.android.datamodel.UserCreationInfo;
+import com.maraudersapp.android.remote.RemoteCallback;
+import com.maraudersapp.android.remote.ServerComm;
+import com.maraudersapp.android.remote.ServerCommManager;
+import com.maraudersapp.android.storage.SharedPrefsUserAccessor;
 
 import butterknife.ButterKnife;
 import butterknife.InjectView;
@@ -19,16 +23,23 @@ import butterknife.InjectView;
  */
 public class SignUpActivity extends AppCompatActivity{
 
+    @InjectView(R.id.input_firstName_signup) EditText firstNameText;
+    @InjectView(R.id.input_lastName_signup) EditText lastNameText;
     @InjectView(R.id.input_username_signup) EditText usernameText;
-    @InjectView(R.id.input_email_signup) EditText emailText;
     @InjectView(R.id.input_password_signup) EditText passwordText;
     @InjectView(R.id.signup_button) Button signUpButton;
     @InjectView(R.id.link_login) TextView login;
+
+    private SharedPrefsUserAccessor storage;
+    private ServerComm remote;
 
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_signup);
         ButterKnife.inject(this);
+
+        storage = new SharedPrefsUserAccessor(getApplicationContext());
+        remote = ServerCommManager.getCommForContext(getApplicationContext());
 
         signUpButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -40,8 +51,6 @@ public class SignUpActivity extends AppCompatActivity{
         login.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
-
                 finish();
             }
         });
@@ -50,41 +59,34 @@ public class SignUpActivity extends AppCompatActivity{
     public void signup() {
 
         if (!validate()) {
-            onSignupFailed();
+            onSignupFailed("Invalid");
             return;
         }
 
         signUpButton.setEnabled(false);
 
-        String name = usernameText.getText().toString();
-        String email = emailText.getText().toString();
+        String username = usernameText.getText().toString();
         String password = passwordText.getText().toString();
+        String firstName = firstNameText.getText().toString();
+        String lastName = lastNameText.getText().toString();
 
-        // TODO: Implement signup to server
+        UserCreationInfo creationReq = new UserCreationInfo(username, password, firstName, lastName);
 
-        onSignupSuccess(); //Put in handle success
-  /*
-        new HttpPostPutTask(new HttpCallback<String>() {
+        remote.createUser(creationReq, new RemoteCallback<String>() {
             @Override
-            public void handleSuccess(String s) {
-               // Log.i(LocationConstants.LOG_TAG, "Server sent successfully. " + s);
-                onLoginSuccess();
+            public void onSuccess(String response) {
+                onSignupSuccess();
             }
 
             @Override
-            public void handleFailure() {
-               // Log.i(LocationConstants.LOG_TAG, "Location send not successful. Code: " + responseCode
-               //         + ". Message: " + errorMessage);
-                onLoginFailed();
+            public void onFailure(int errorCode, String message) {
+                onSignupFailed(errorCode + ": " + message);
             }
-        }).execute(new PutUserNamePass(username, password));
-
-     */
+        });
     }
 
 
     public void onSignupSuccess() {
-        putCredentials();
         Toast.makeText(getBaseContext(), "Signup Successful!", Toast.LENGTH_LONG).show();
         signUpButton.setEnabled(true);
         setResult(RESULT_OK, null);
@@ -92,29 +94,37 @@ public class SignUpActivity extends AppCompatActivity{
         startActivity(i);
     }
 
-    public void onSignupFailed() {
-        Toast.makeText(getBaseContext(), "Signup Failed", Toast.LENGTH_LONG).show();
+    public void onSignupFailed(String msg) {
+        Toast.makeText(getBaseContext(), msg, Toast.LENGTH_LONG).show();
         signUpButton.setEnabled(true);
     }
 
     public boolean validate() {
         boolean valid = true;
         String username = usernameText.getText().toString();
-        String email = emailText.getText().toString();
         String password = passwordText.getText().toString();
+        String firstName = firstNameText.getText().toString();
+        String lastName = lastNameText.getText().toString();
+
+        if (firstName.isEmpty() || firstName.length() <= 0) {
+            firstNameText.setError("Enter your name so friends can find you!");
+            valid = false;
+        } else {
+            firstNameText.setError(null);
+        }
+
+        if (lastName.isEmpty() || lastName.length() <= 0) {
+            lastNameText.setError("Enter your name so friends can find you!");
+            valid = false;
+        } else {
+            lastNameText.setError(null);
+        }
 
         if (username.isEmpty() || username.length() < 3) {
             usernameText.setError("At least 3 characters");
             valid = false;
         } else {
             usernameText.setError(null);
-        }
-
-        if (email.isEmpty() || !android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
-            emailText.setError("Enter a valid email address");
-            valid = false;
-        } else {
-            emailText.setError(null);
         }
 
         if (password.isEmpty() || password.length() < 4 || password.length() > 10) {
@@ -125,14 +135,5 @@ public class SignUpActivity extends AppCompatActivity{
         }
 
         return valid;
-    }
-
-    public void putCredentials() {
-        SharedPreferences.Editor editor = getSharedPreferences(LoginActivity.LOGIN_PREFS_NAME, MODE_PRIVATE).edit();
-        if (editor != null) {
-            editor.putString("username", usernameText.getText().toString());
-            editor.putString("password", passwordText.getText().toString());
-            editor.commit();
-        }
     }
 }

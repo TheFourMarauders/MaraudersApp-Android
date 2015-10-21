@@ -8,11 +8,11 @@ import java.util.Map;
 /**
  * Created by Matthew on 10/16/2015.
  */
-public class ServerCommFactory {
+public class ServerCommManager {
 
     private static Map<Context, ServerComm> comms = new HashMap<>();
 
-    public ServerComm build(Context context) {
+    public static ServerComm getCommForContext(Context context) {
         if (comms.get(context) == null) {
             ServerComm comm = new HttpVolleyDispatcher(
                     context, new ServerConfig("http://maraudersapp.cloudapp.net", 27380));
