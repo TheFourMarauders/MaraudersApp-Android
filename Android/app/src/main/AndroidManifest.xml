@@ -33,12 +33,39 @@
         <activity
             android:name=".MapsActivity"
             android:label="@string/title_activity_maps">
+   <!--         <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+            -->
+        </activity>
+        <activity
+            android:name=".LoginActivity" android:theme="@style/AppTheme">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
+
         </activity>
+        <activity android:name=".SignUpActivity" android:theme="@style/AppTheme" />
+
+        <service
+            android:enabled="true"
+            android:name=".location.LocationUpdaterService">
+            <intent-filter>
+                <action
+                    android:name = "com.maraudersapp.android.location.LocationUpdaterService">
+                </action>
+            </intent-filter>
+        </service>
+
+        <receiver android:name=".location.ConnectivityReceiver" android:enabled="true">
+            <intent-filter>
+                <action android:name="android.net.conn.CONNECTIVITY_CHANGE" />
+            </intent-filter>
+        </receiver>
 
         <service
             android:enabled="true"
