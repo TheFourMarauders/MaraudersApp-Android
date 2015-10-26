@@ -10,10 +10,19 @@ import android.os.Bundle;
 import android.os.IBinder;
 import android.os.PowerManager;
 import android.util.Log;
+import android.view.View;
 
+import com.maraudersapp.android.SignUpActivity;
+import com.maraudersapp.android.datamodel.LocationInfo;
 import com.maraudersapp.android.net.HttpCallback;
 import com.maraudersapp.android.net.HttpPostPutTask;
 import com.maraudersapp.android.net.methods.post_put.PutUserLocation;
+import com.maraudersapp.android.remote.RemoteCallback;
+import com.maraudersapp.android.remote.ServerComm;
+import com.maraudersapp.android.remote.ServerCommManager;
+import com.maraudersapp.android.storage.SharedPrefsUserAccessor;
+
+import java.util.Arrays;
 
 
 public  final class LocationUpdaterService extends Service implements LocationListener {
@@ -27,6 +36,9 @@ public  final class LocationUpdaterService extends Service implements LocationLi
     private LocationManager locationManager;
     private PowerManager.WakeLock wakeLock;
 
+    private ServerComm remote;
+    private SharedPrefsUserAccessor storage;
+
     static {
         state = State.IDLE;
     }
@@ -37,6 +49,14 @@ public  final class LocationUpdaterService extends Service implements LocationLi
         Log.i(LocationConstants.LOG_TAG, "Location service started");
         final PowerManager pm = (PowerManager) getSystemService(Context.POWER_SERVICE);
         this.wakeLock = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "LocationUpdaterService");
+
+        storage = new SharedPrefsUserAccessor(getApplicationContext());
+
+        if(!storage.isCredentialsNull()) {
+            // TODO is this possible / what does this mean?
+        }
+
+        remote = ServerCommManager.getCommForContext(getApplicationContext());
     }
 
 
@@ -74,20 +94,23 @@ public  final class LocationUpdaterService extends Service implements LocationLi
 
     private void sendToServer(Location location) {
         // send to server in background thread. you might want to start AsyncTask here
-        new HttpPostPutTask(new HttpCallback<String>() {
-            @Override
-            public void handleSuccess(String s) {
-                Log.i(LocationConstants.LOG_TAG, "Server sent successfully. " + s);
-                onSendingFinished();
-            }
+        remote.putLocationsFor(
+                storage.getUsername(),
+                Arrays.asList(new LocationInfo(location)),
+                new RemoteCallback<String>() {
+                    @Override
+                    public void onSuccess(String response) {
+                        Log.i(LocationConstants.LOG_TAG, response);
+                        onSendingFinished();
+                    }
 
-            @Override
-            public void handleFailure(int responseCode, String errorMessage) {
-                Log.i(LocationConstants.LOG_TAG, "Location send not successful. Code: " + responseCode
-                        + ". Message: " + errorMessage);
-                onSendingFinished();
-            }
-        }).execute(new PutUserLocation("mjmaurer", location));
+                    @Override
+                    public void onFailure(int errorCode, String message) {
+                        Log.i(LocationConstants.LOG_TAG, message);
+                        onSendingFinished();
+                    }
+                }
+        );
         // TODO fix this
     }
 
