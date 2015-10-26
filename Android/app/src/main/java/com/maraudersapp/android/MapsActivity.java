@@ -4,6 +4,8 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.location.Location;
+import android.location.LocationManager;
 import android.os.Bundle;
 import android.preference.Preference;
 import android.preference.PreferenceManager;
@@ -16,6 +18,10 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 
 import com.cocosw.bottomsheet.BottomSheet;
+import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.common.api.GoogleApiClient.ConnectionCallbacks;
+import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
@@ -51,6 +57,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     private Toolbar mToolbar;
     private Drawer mDrawer;
     private AccountHeader mHeader;
+    private GoogleApiClient mGApi;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -166,6 +173,21 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
         mMap.setMyLocationEnabled(true);
+
+        LocationManager locationManager = (LocationManager) this.getSystemService(Context.LOCATION_SERVICE);
+        Location loc = locationManager.getLastKnownLocation(LocationManager.PASSIVE_PROVIDER);
+
+        if (loc != null) {
+            Log.i(MAPS_ACTIVITY_TAG, "Last location: " + loc.toString());
+            CameraUpdate center =
+                    CameraUpdateFactory.newLatLng(new LatLng(loc.getLatitude(), loc.getLongitude()));
+            CameraUpdate zoom = CameraUpdateFactory.zoomTo(10);
+
+            mMap.animateCamera(center);
+            mMap.animateCamera(zoom);
+        } else {
+            Log.i(MAPS_ACTIVITY_TAG, "Last location null");
+        }
     }
 
     /**

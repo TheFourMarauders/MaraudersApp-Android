@@ -6,6 +6,7 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.maraudersapp.android.util.TimeUtil;
 
+import java.sql.Time;
 import java.util.Date;
 
 /**
@@ -30,7 +31,7 @@ public class LocationInfo {
     }
 
     public LocationInfo(Location l) {
-        this(l.getLatitude(), l.getLongitude(), new Date(l.getTime()));
+        this(l.getLatitude(), l.getLongitude(), TimeUtil.getCurrentTime());
     }
 
     public double getLatitude() {

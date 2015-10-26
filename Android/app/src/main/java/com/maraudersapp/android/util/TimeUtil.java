@@ -12,14 +12,14 @@ import java.util.TimeZone;
  */
 public final class TimeUtil {
 
-    public static String getCurrentTime() {
+    public synchronized static String getCurrentTime() {
         TimeZone tz = TimeZone.getTimeZone("UTC");
         DateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:ss:mm'Z'");
         df.setTimeZone(tz);
         return df.format(new Date());
     }
 
-    public static Date parseDate(String date) {
+    public synchronized static Date parseDate(String date) {
         TimeZone tz = TimeZone.getTimeZone("UTC");
         DateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:ss:mm'Z'");
         df.setTimeZone(tz);
@@ -32,7 +32,7 @@ public final class TimeUtil {
         return d;
     }
 
-    public static String dateToString(Date d) {
+    public synchronized static String dateToString(Date d) {
         TimeZone tz = TimeZone.getTimeZone("UTC");
         DateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:ss:mm'Z'");
         df.setTimeZone(tz);
