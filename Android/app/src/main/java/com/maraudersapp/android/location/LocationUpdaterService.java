@@ -11,9 +11,14 @@ import android.os.IBinder;
 import android.os.PowerManager;
 import android.util.Log;
 
-import com.maraudersapp.android.net.HttpCallback;
-import com.maraudersapp.android.net.HttpPostPutTask;
-import com.maraudersapp.android.net.methods.post_put.PutUserLocation;
+import com.maraudersapp.android.datamodel.LocationInfo;
+import com.maraudersapp.android.remote.RemoteCallback;
+import com.maraudersapp.android.remote.ServerComm;
+import com.maraudersapp.android.remote.ServerCommManager;
+import com.maraudersapp.android.storage.SharedPrefsUserAccessor;
+
+import java.util.ArrayList;
+import java.util.List;
 
 
 public  final class LocationUpdaterService extends Service implements LocationListener {
@@ -73,22 +78,26 @@ public  final class LocationUpdaterService extends Service implements LocationLi
     }
 
     private void sendToServer(Location location) {
+        LocationInfo loc = new LocationInfo(location);
+        ServerComm comm = ServerCommManager.getCommForContext(getApplicationContext());
         // send to server in background thread. you might want to start AsyncTask here
-        new HttpPostPutTask(new HttpCallback<String>() {
-            @Override
-            public void handleSuccess(String s) {
-                Log.i(LocationConstants.LOG_TAG, "Server sent successfully. " + s);
-                onSendingFinished();
-            }
+        List<LocationInfo> locList = new ArrayList<>();
+        locList.add(loc);
+        comm.putLocationsFor(new SharedPrefsUserAccessor(getApplicationContext()).getUsername(),
+                locList, new RemoteCallback<String>() {
+                    @Override
+                    public void onSuccess(String response) {
+                        Log.i(LocationConstants.LOG_TAG, "Server sent successfully. " + response);
+                        onSendingFinished();
+                    }
 
-            @Override
-            public void handleFailure(int responseCode, String errorMessage) {
-                Log.i(LocationConstants.LOG_TAG, "Location send not successful. Code: " + responseCode
-                        + ". Message: " + errorMessage);
-                onSendingFinished();
-            }
-        }).execute(new PutUserLocation("mjmaurer", location));
-        // TODO fix this
+                    @Override
+                    public void onFailure(int errorCode, String message) {
+                        Log.i(LocationConstants.LOG_TAG, "Location send not successful. Code: " + errorCode
+                                + ". Message: " + message);
+                        onSendingFinished();
+                    }
+                });
     }
 
     private void onSendingFinished() {
