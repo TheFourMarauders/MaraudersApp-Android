@@ -12,17 +12,15 @@ import android.os.PowerManager;
 import android.util.Log;
 import android.view.View;
 
-import com.maraudersapp.android.SignUpActivity;
 import com.maraudersapp.android.datamodel.LocationInfo;
-import com.maraudersapp.android.net.HttpCallback;
-import com.maraudersapp.android.net.HttpPostPutTask;
-import com.maraudersapp.android.net.methods.post_put.PutUserLocation;
 import com.maraudersapp.android.remote.RemoteCallback;
 import com.maraudersapp.android.remote.ServerComm;
 import com.maraudersapp.android.remote.ServerCommManager;
 import com.maraudersapp.android.storage.SharedPrefsUserAccessor;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 
 public  final class LocationUpdaterService extends Service implements LocationListener {
@@ -93,6 +91,7 @@ public  final class LocationUpdaterService extends Service implements LocationLi
     }
 
     private void sendToServer(Location location) {
+
         // send to server in background thread. you might want to start AsyncTask here
         remote.putLocationsFor(
                 storage.getUsername(),
@@ -106,12 +105,11 @@ public  final class LocationUpdaterService extends Service implements LocationLi
 
                     @Override
                     public void onFailure(int errorCode, String message) {
-                        Log.i(LocationConstants.LOG_TAG, message);
+                        Log.i(LocationConstants.LOG_TAG, "Location send not successful. Code: " + errorCode
+                                + ". Message: " + message);
                         onSendingFinished();
                     }
-                }
-        );
-        // TODO fix this
+                });
     }
 
     private void onSendingFinished() {
