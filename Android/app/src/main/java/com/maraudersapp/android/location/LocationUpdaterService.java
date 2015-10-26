@@ -1,14 +1,19 @@
 package com.maraudersapp.android.location;
 
+import android.app.AlarmManager;
+import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.os.PowerManager;
+import android.os.SystemClock;
 import android.util.Log;
 import android.view.View;
 
@@ -41,6 +46,39 @@ public  final class LocationUpdaterService extends Service implements LocationLi
 
     static {
         state = State.IDLE;
+    }
+
+
+    //TODO begin alarm on startup
+    /**
+     * We need data because aGPS needs data to retreive location.
+     */
+    public static void scheduleLocationPolling(Context context) {
+        final AlarmManager alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
+        // Same intents will overwrite any existing previous one :)
+        final PendingIntent wakeupIntent = PendingIntent.getService(context, 0,
+                new Intent(context, LocationUpdaterService.class), PendingIntent.FLAG_UPDATE_CURRENT);
+
+        ConnectivityManager cm =
+                (ConnectivityManager)context.getSystemService(Context.CONNECTIVITY_SERVICE);
+
+        NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
+        boolean hasNetwork = activeNetwork != null &&
+                activeNetwork.isConnectedOrConnecting();
+        Log.i(LocationConstants.LOG_TAG, "Attempting to schedule location update. Network on?: " + hasNetwork);
+
+        if (hasNetwork) {
+            // start service now for doing once
+            context.startService(new Intent(context, LocationUpdaterService.class));
+
+            // TODO change back
+            // schedule service for every minute
+            alarmManager.setInexactRepeating(AlarmManager.ELAPSED_REALTIME_WAKEUP,
+                    SystemClock.elapsedRealtime(),
+                    LocationConstants.GPS_INTERVAL, wakeupIntent);
+        } else {
+            alarmManager.cancel(wakeupIntent);
+        }
     }
 
     @Override
@@ -107,11 +145,11 @@ public  final class LocationUpdaterService extends Service implements LocationLi
                     @Override
                     public void onFailure(int errorCode, String message) {
                         Log.i(LocationConstants.LOG_TAG, message);
+                        // TODO logout / credential issues
                         onSendingFinished();
                     }
                 }
         );
-        // TODO fix this
     }
 
     private void onSendingFinished() {

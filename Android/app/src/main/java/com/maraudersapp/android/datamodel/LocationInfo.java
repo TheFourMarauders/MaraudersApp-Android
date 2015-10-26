@@ -30,7 +30,7 @@ public class LocationInfo {
     }
 
     public LocationInfo(Location l) {
-        this(l.getLatitude(), l.getLongitude(), TimeUtil.getCurrentTime());
+        this(l.getLatitude(), l.getLongitude(), new Date(l.getTime()));
     }
 
     public double getLatitude() {
