@@ -1,11 +1,12 @@
 package com.maraudersapp.android;
 
-import android.app.FragmentTransaction;
-import android.app.ListFragment;
 import android.content.Context;
 import android.content.res.Resources;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
+import android.support.v4.app.FragmentTransaction;
+import android.support.v4.app.ListFragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -20,6 +21,7 @@ import com.maraudersapp.android.remote.ServerCommManager;
 import com.maraudersapp.android.storage.SharedPrefsUserAccessor;
 import com.maraudersapp.android.FriendsListAdapter.FriendsListItem;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
@@ -28,35 +30,45 @@ import java.util.Set;
  */
 public class FriendsListFragment extends ListFragment {
 
-    private List<FriendsListItem> mItems;        // ListView items list
+    private static final String FRIENDS_LIST_TAG = "FRIENDS_LIST";
+
+    private ArrayAdapter<FriendsListItem> mAdapter;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        mAdapter = new FriendsListAdapter(getActivity(), new ArrayList<FriendsListItem>());
 
         ServerCommManager.getCommForContext(getContext()).getFriendsFor(
                 new SharedPrefsUserAccessor(getContext()).getUsername(),
                 new RemoteCallback<Set<UserInfo>>() {
                     @Override
                     public void onSuccess(Set<UserInfo> response) {
+                        Log.i(FRIENDS_LIST_TAG, "Got friends: " + response.size());
                         populateListItems(response);
-                        setListAdapter(new FriendsListAdapter(getActivity(), mItems));
                     }
 
                     @Override
                     public void onFailure(int errorCode, String message) {
+                        Log.i(FRIENDS_LIST_TAG, message);
                         //TODO
                     }
                 });
 
+        setListAdapter(mAdapter);
         // TODO loading screen?
     }
 
     private void populateListItems(Set<UserInfo> response) {
+        mAdapter.clear();
+
         for (UserInfo user : response) {
-            mItems.add(new FriendsListItem(null, user.getFirstName() + " " + user.getLastName(),
-                    user.getUsername()));
+            mAdapter.insert(new FriendsListItem(null, user.getFirstName() + " " + user.getLastName(),
+                    user.getUsername()), mAdapter.getCount());
         }
+
+        mAdapter.notifyDataSetChanged();
     }
 
     @Override
@@ -69,9 +81,10 @@ public class FriendsListFragment extends ListFragment {
     @Override
     public void onListItemClick(ListView l, View v, int position, long id) {
         // retrieve theListView item
-        FriendsListItem item = mItems.get(position);
+        // TODO clear back stack?
+        FriendsListItem item = mAdapter.getItem(position);
         FragmentTransaction tx = getFragmentManager().beginTransaction();
-        tx.replace(R.id.main_parent_view, Frag);
+        tx.replace(R.id.main_parent_view, new MapsFragment());
         tx.commit();
     }
 }
