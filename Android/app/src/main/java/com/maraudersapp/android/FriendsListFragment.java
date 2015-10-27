@@ -34,6 +34,8 @@ public class FriendsListFragment extends ListFragment {
 
     private ArrayAdapter<FriendsListItem> mAdapter;
 
+    public FriendsListFragment
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

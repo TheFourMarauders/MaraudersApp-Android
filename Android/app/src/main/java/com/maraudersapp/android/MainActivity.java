@@ -47,6 +47,7 @@ public class MainActivity extends AppCompatActivity {
     private AccountHeader mHeader;
     private GoogleApiClient mGApi;
     private SharedPrefsUserAccessor storage;
+    private Fragment mapFragment;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -64,7 +65,7 @@ public class MainActivity extends AppCompatActivity {
     private void initMap() {
         FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
         fragmentTransaction.add(R.id.main_parent_view,
-                        MapsFragment.newInstance(),
+                        mapFragment,
                         "map");
         fragmentTransaction.addToBackStack(null);
         fragmentTransaction.commit();
@@ -110,6 +111,13 @@ public class MainActivity extends AppCompatActivity {
 
                     if (drawerItem.isEnabled()) {
                         mDrawer.closeDrawer();
+                    }
+
+                    if (position == 1) {
+                        FragmentTransaction tx = getSupportFragmentManager().beginTransaction();
+                        tx.hide(mapFragment);
+                        tx.replace(R.id.main_parent_view, new FriendsListFragment());
+                        tx.commit();
                     }
 
 
@@ -234,9 +242,7 @@ public class MainActivity extends AppCompatActivity {
         }
 
         private static void loadFragment(Fragment fragment, FragmentManager fragmentManager) {
-            FragmentTransaction tx = fragmentManager.beginTransaction();
-            tx.replace(R.id.main_parent_view, fragment);
-            tx.commit();
+
         }
     }
 }

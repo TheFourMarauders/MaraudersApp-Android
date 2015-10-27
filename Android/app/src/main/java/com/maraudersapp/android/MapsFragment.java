@@ -4,6 +4,7 @@ import android.content.Context;
 import android.location.Location;
 import android.location.LocationManager;
 import android.os.Bundle;
+import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -11,9 +12,12 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.RelativeLayout;
 
+import com.google.android.gms.common.GooglePlayServicesNotAvailableException;
 import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.MapView;
+import com.google.android.gms.maps.MapsInitializer;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
@@ -21,48 +25,31 @@ import com.google.android.gms.maps.model.LatLng;
 /**
  * Created by Michael on 10/26/2015.
  */
-public class MapsFragment extends SupportMapFragment implements OnMapReadyCallback {
+public class MapsFragment extends Fragment implements OnMapReadyCallback {
 
     private static final String MAPS_ACTIVITY_TAG = "MAPS";
 
     private GoogleMap mMap;
-    private View mView;
-
-    public static MapsFragment newInstance() {
-        return new MapsFragment();
-    }
+    private MapView mapView;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         Log.i(MAPS_ACTIVITY_TAG, "Creating map view");
 
-        super.onCreateView(inflater, container, savedInstanceState);
+        View v = inflater.inflate(R.layout.maps_fragment, container, false);
 
-        if (container == null) {
-            return null;
-        }
+ 		// Gets the MapView from the XML layout and creates it
+		mapView = (MapView) v.findViewById(R.id.location_map);
+		mapView.onCreate(savedInstanceState);
 
-        if (mView == null) {
-            Log.i(MAPS_ACTIVITY_TAG, "Maps view is null");
-            mView = (RelativeLayout) inflater.inflate(R.layout.maps_fragment, container, false);
-        }
+        // Needs to call MapsInitializer before doing any CameraUpdateFactory calls
+        MapsInitializer.initialize(this.getActivity());
 
-        SupportMapFragment mapFrag = (SupportMapFragment) getChildFragmentManager()
-                .findFragmentById(R.id.location_map);
+		// Gets to GoogleMap from the MapView and does initialization stuff
+		mapView.getMapAsync(this);
 
-        if (mapFrag == null) {
-            Log.i(MAPS_ACTIVITY_TAG, "Maps fragment is null");
-            mapFrag = MapsFragment.newInstance();
-            FragmentTransaction ft = getActivity().getSupportFragmentManager().beginTransaction();
-            ft.add(R.id.main_parent_view, mapFrag);
-            ft.addToBackStack(null);
-            ft.commit();
-        }
-
-        mapFrag.getMapAsync(this);
-
-        return mView;
+		return v;
     }
 
     @Override
@@ -74,7 +61,7 @@ public class MapsFragment extends SupportMapFragment implements OnMapReadyCallba
     @Override
     public void onStop() {
         Log.i(MAPS_ACTIVITY_TAG, "Maps stopped");
-        super.onPause();
+        super.onStop();
     }
 
     /**
@@ -112,10 +99,20 @@ public class MapsFragment extends SupportMapFragment implements OnMapReadyCallba
     }
 
     @Override
-    public void onDestroyView() {
+    public void onResume() {
+        mapView.onResume();
+        super.onResume();
+    }
 
-        Log.i(MAPS_ACTIVITY_TAG, "Map destroyed");
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        mapView.onDestroy();
+    }
 
-        super.onDestroyView();
+    @Override
+    public void onLowMemory() {
+        super.onLowMemory();
+        mapView.onLowMemory();
     }
 }
