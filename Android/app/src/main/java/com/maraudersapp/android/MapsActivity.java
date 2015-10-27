@@ -180,11 +180,11 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         if (loc != null) {
             Log.i(MAPS_ACTIVITY_TAG, "Last location: " + loc.toString());
             CameraUpdate center =
-                    CameraUpdateFactory.newLatLng(new LatLng(loc.getLatitude(), loc.getLongitude()));
-            CameraUpdate zoom = CameraUpdateFactory.zoomTo(10);
+                    CameraUpdateFactory.newLatLngZoom(
+                            new LatLng(loc.getLatitude(), loc.getLongitude()),
+                            15); // Zoom level
 
             mMap.animateCamera(center);
-            mMap.animateCamera(zoom);
         } else {
             Log.i(MAPS_ACTIVITY_TAG, "Last location null");
         }
