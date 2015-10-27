@@ -1,14 +1,14 @@
 package com.maraudersapp.android;
 
+import android.app.Fragment;
+import android.app.FragmentManager;
+import android.app.FragmentTransaction;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.location.Location;
 import android.location.LocationManager;
 import android.os.Bundle;
-import android.preference.Preference;
-import android.preference.PreferenceManager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
@@ -19,16 +19,14 @@ import android.view.MenuItem;
 
 import com.cocosw.bottomsheet.BottomSheet;
 import com.google.android.gms.common.api.GoogleApiClient;
-import com.google.android.gms.common.api.GoogleApiClient.ConnectionCallbacks;
-import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
-import com.google.android.gms.maps.model.MarkerOptions;
 import com.maraudersapp.android.location.LocationUpdaterService;
+import com.maraudersapp.android.storage.SharedPrefsUserAccessor;
 import com.mikepenz.materialdrawer.AccountHeader;
 import com.mikepenz.materialdrawer.AccountHeaderBuilder;
 import com.mikepenz.materialdrawer.Drawer;
@@ -46,7 +44,7 @@ import java.util.ArrayList;
  *
  * Extends AppCompatActivity for Toolbar use.
  */
-public class MapsActivity extends AppCompatActivity implements OnMapReadyCallback {
+public class MainActivity extends AppCompatActivity {
 
     // Logging within this class.
     private static final String MAPS_ACTIVITY_TAG = "MAPS_TAG";
@@ -58,18 +56,20 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     private Drawer mDrawer;
     private AccountHeader mHeader;
     private GoogleApiClient mGApi;
+    private SharedPrefsUserAccessor storage;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_maps);
-
         initToolbarAndDrawer();
 
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
+
+        storage = new SharedPrefsUserAccessor(getApplicationContext());
 
         LocationUpdaterService.scheduleLocationPolling(getApplicationContext());
     }
@@ -87,9 +87,8 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                 .withActivity(this)
                 .withHeaderBackground(R.drawable.navigation_header)
                 .addProfiles(
-                        new ProfileDrawerItem().withName("Michael Maurer")
-                                .withEmail("mjmaurer777@gmail.com")
-                                .withIcon(getResources().getDrawable(R.drawable.michael))
+                        new ProfileDrawerItem().withName(storage.getUsername())
+                                .withIcon(getResources().getDrawable(R.drawable.michael)) // TODO user icon
                 )
                 .build();
 
@@ -114,7 +113,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                     }
 
 
-                    DrawerItem.values()[position - 1].handleClick();
+                    DrawerItem.values()[position - 1].handleClick(MainActivity.this, getFragmentManager());
                     return true;
                 }
             })
@@ -202,45 +201,46 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         YOURSELF(new PrimaryDrawerItem().withName(R.string.yourself_item_name).withIdentifier(1).withSelectable(false)) {
 
             @Override
-            public void handleClick() {
+            public void handleClick(Context context, FragmentManager fragmentManager) {
                 Log.i(MAPS_ACTIVITY_TAG, "Yourself clicked");
             }
         },
         FRIENDS(new PrimaryDrawerItem().withName(R.string.friends_item_name).withIdentifier(2).withSelectable(false)) {
 
             @Override
-            public void handleClick() {
+            public void handleClick(Context context, FragmentManager fragmentManager) {
+                loadFragment(new FriendsListFragment(), fragmentManager);
                 Log.i(MAPS_ACTIVITY_TAG, "Friends clicked");
             }
         },
         GROUPS(new PrimaryDrawerItem().withName(R.string.groups_item_name).withIdentifier(3).withSelectable(false)) {
             @Override
-            public void handleClick() {
+            public void handleClick(Context context, FragmentManager fragmentManager) {
                 Log.i(MAPS_ACTIVITY_TAG, "Groups clicked");
             }
         },
         SEPARATE(new DividerDrawerItem()) {
             @Override
-            public void handleClick() {}
+            public void handleClick(Context context, FragmentManager fragmentManager) {}
         },
         INCOGNITO(new ToggleDrawerItem().withName(R.string.incognito_item_name).withIdentifier(4).withSelectable(false)) {
 
             @Override
-            public void handleClick() {
+            public void handleClick(Context context, FragmentManager fragmentManager) {
                 Log.i(MAPS_ACTIVITY_TAG, "Incognito clicked");
             }
         },
         SETTINGS(new PrimaryDrawerItem().withName(R.string.settings_item_name).withIdentifier(5).withSelectable(false)) {
 
             @Override
-            public void handleClick() {
+            public void handleClick(Context context, FragmentManager fragmentManager) {
                 Log.i(MAPS_ACTIVITY_TAG, "Settings clicked");
             }
         },
         LOGOUT(new PrimaryDrawerItem().withName(R.string.logout_item_name).withIdentifier(6).withSelectable(false)) {
 
             @Override
-            public void handleClick() { Log.i(MAPS_ACTIVITY_TAG, "Logout clicked"); }
+            public void handleClick(Context context, FragmentManager fragmentManager) { Log.i(MAPS_ACTIVITY_TAG, "Logout clicked"); }
         };
 
         // Actual DrawerItem to be drawn.
@@ -249,7 +249,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         /**
          * Action to complete when the DrawerItem is clicked in the UI.
          */
-        public abstract void handleClick();
+        public abstract void handleClick(Context context, FragmentManager fragmentManager);
 
         DrawerItem(IDrawerItem drawerItem) {
             this.drawerItem = drawerItem;
@@ -264,6 +264,12 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                 toReturn.add(item.drawerItem);
             }
             return toReturn;
+        }
+
+        private static void loadFragment(Fragment fragment, FragmentManager fragmentManager) {
+            FragmentTransaction tx = fragmentManager.beginTransaction();
+            tx.replace(R.id.main_parent_view, fragment);
+            tx.commit();
         }
     }
 }
