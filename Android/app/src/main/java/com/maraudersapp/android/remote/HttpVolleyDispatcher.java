@@ -284,6 +284,10 @@ public class HttpVolleyDispatcher implements ServerComm {
         @Override
         public void onErrorResponse(VolleyError error) {
             try {
+                if (error.networkResponse == null) {
+                    callback.onFailure(444, "No Response");
+                    return;
+                }
                 callback.onFailure(error.networkResponse.statusCode,
                         new String(error.networkResponse.data,
                                 HttpHeaderParser.parseCharset(error.networkResponse.headers)));

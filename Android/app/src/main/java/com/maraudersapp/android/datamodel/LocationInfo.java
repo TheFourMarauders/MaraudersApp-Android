@@ -26,10 +26,6 @@ public class LocationInfo {
         this.time = time;
     }
 
-    public LocationInfo(double latitude, double longitude, Date time) {
-        this(latitude, longitude, TimeUtil.dateToString(time));
-    }
-
     public LocationInfo(Location l) {
         this(l.getLatitude(), l.getLongitude(), TimeUtil.getCurrentTime());
     }
@@ -42,8 +38,12 @@ public class LocationInfo {
         return longitude;
     }
 
-    public Date getTime() {
+    public Date timeStringToDate() {
         return TimeUtil.parseDate(time);
+    }
+
+    public String getTime() {
+        return time;
     }
 
     @Override

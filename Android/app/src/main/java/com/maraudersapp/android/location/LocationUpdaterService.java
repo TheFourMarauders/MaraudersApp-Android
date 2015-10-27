@@ -17,6 +17,7 @@ import android.os.SystemClock;
 import android.util.Log;
 import android.view.View;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.maraudersapp.android.datamodel.LocationInfo;
 import com.maraudersapp.android.remote.RemoteCallback;
 import com.maraudersapp.android.remote.ServerComm;
@@ -130,24 +131,26 @@ public  final class LocationUpdaterService extends Service implements LocationLi
 
     private void sendToServer(Location location) {
 
+        List<LocationInfo> locations = new ArrayList<>();
+        locations.add(new LocationInfo(location));
         // send to server in background thread. you might want to start AsyncTask here
-        remote.putLocationsFor(
-                storage.getUsername(),
-                Arrays.asList(new LocationInfo(location)),
-                new RemoteCallback<String>() {
-                    @Override
-                    public void onSuccess(String response) {
-                        Log.i(LocationConstants.LOG_TAG, response);
-                        onSendingFinished();
-                    }
 
-                    @Override
-                    public void onFailure(int errorCode, String message) {
-                        Log.i(LocationConstants.LOG_TAG, message);
-                        // TODO logout / credential issues
-                        onSendingFinished();
-                    }
+        remote.putLocationsFor(
+            storage.getUsername(), locations,
+            new RemoteCallback<String>() {
+                @Override
+                public void onSuccess(String response) {
+                    Log.i(LocationConstants.LOG_TAG, response);
+                    onSendingFinished();
                 }
+
+                @Override
+                public void onFailure(int errorCode, String message) {
+                    Log.i(LocationConstants.LOG_TAG, message);
+                    // TODO logout / credential issues
+                    onSendingFinished();
+                }
+            }
         );
     }
 

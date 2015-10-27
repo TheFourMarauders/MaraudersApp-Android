@@ -38,6 +38,7 @@ public class LoginActivity extends AppCompatActivity {
     @InjectView(R.id.login_button) Button loginButton;
     @InjectView(R.id.link_signup) TextView signUp;
 
+    @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
@@ -74,6 +75,13 @@ public class LoginActivity extends AppCompatActivity {
         });
 
         remote = ServerCommManager.getCommForContext(getApplicationContext());
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        remote = ServerCommManager.getCommForContext(getApplicationContext());
+        storage = new SharedPrefsUserAccessor(getApplicationContext());
     }
 
     public void login() {

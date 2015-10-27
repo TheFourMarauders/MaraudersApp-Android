@@ -33,6 +33,7 @@ public class SignUpActivity extends AppCompatActivity{
     private SharedPrefsUserAccessor storage;
     private ServerComm remote;
 
+    @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_signup);
@@ -56,6 +57,13 @@ public class SignUpActivity extends AppCompatActivity{
         });
     }
 
+    @Override
+    public void onResume() {
+        super.onResume();
+        remote = ServerCommManager.getCommForContext(getApplicationContext());
+        storage = new SharedPrefsUserAccessor(getApplicationContext());
+    }
+
     public void signup() {
 
         if (!validate()) {
@@ -65,8 +73,8 @@ public class SignUpActivity extends AppCompatActivity{
 
         signUpButton.setEnabled(false);
 
-        String username = usernameText.getText().toString();
-        String password = passwordText.getText().toString();
+        final String username = usernameText.getText().toString();
+        final String password = passwordText.getText().toString();
         String firstName = firstNameText.getText().toString();
         String lastName = lastNameText.getText().toString();
 
@@ -75,6 +83,7 @@ public class SignUpActivity extends AppCompatActivity{
         remote.createUser(creationReq, new RemoteCallback<String>() {
             @Override
             public void onSuccess(String response) {
+                storage.putCredentials(username, password);
                 onSignupSuccess();
             }
 
