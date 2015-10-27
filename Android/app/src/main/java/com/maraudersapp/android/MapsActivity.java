@@ -44,7 +44,7 @@ import java.util.ArrayList;
  *
  * Extends AppCompatActivity for Toolbar use.
  */
-public class MainActivity extends AppCompatActivity implements OnMapReadyCallback {
+public class MapsActivity extends AppCompatActivity implements OnMapReadyCallback {
 
     // Logging within this class.
     private static final String MAPS_ACTIVITY_TAG = "MAPS_TAG";
@@ -113,7 +113,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                     }
 
 
-                    DrawerItem.values()[position - 1].handleClick(MainActivity.this, getFragmentManager());
+                    DrawerItem.values()[position - 1].handleClick(MapsActivity.this, getFragmentManager());
                     return true;
                 }
             })

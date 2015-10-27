@@ -90,7 +90,7 @@ public class SignUpActivity extends AppCompatActivity{
         Toast.makeText(getBaseContext(), "Signup Successful!", Toast.LENGTH_LONG).show();
         signUpButton.setEnabled(true);
         setResult(RESULT_OK, null);
-        Intent i = new Intent(this,MainActivity.class);
+        Intent i = new Intent(this,MapsActivity.class);
         startActivity(i);
     }
 
