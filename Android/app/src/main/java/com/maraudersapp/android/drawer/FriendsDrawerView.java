@@ -34,7 +34,7 @@ public class FriendsDrawerView extends DrawerView {
         List<DrawerItem> items = new ArrayList<>();
         // TODO back arrow
         for (UserInfo user : users) {
-            items.add(new DrawerItem(new PrimaryDrawerItem().withName(user.getFirstName() + " " + user.getLastName())){
+            items.add(new DrawerItem(new PrimaryDrawerItem().withName(user.getFirstName() + " " + user.getLastName())) {
                 @Override
                 public void handleClick(View view, IDrawerItem drawerItem) {
                     Log.i(DRAWER_TAG, "Specific friends clicked");

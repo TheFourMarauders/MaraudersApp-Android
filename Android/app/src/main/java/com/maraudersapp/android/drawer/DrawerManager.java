@@ -17,28 +17,26 @@ import java.util.Stack;
  */
 public class DrawerManager {
 
-    private Stack<DrawerView> backStack;
-
     private final Drawer drawer;
     private final Toolbar toolbar;
+
+    private boolean atMainView;
 
     public DrawerManager(Drawer drawer, Toolbar toolbar, Context ctx) {
         this.drawer = drawer;
         this.toolbar = toolbar;
-        this.backStack = new Stack<>();
 
-
-        DrawerView initialView = new MainDrawerView(ServerCommManager.getCommForContext(ctx),
+        DrawerView mainDrawerView = new MainDrawerView(ServerCommManager.getCommForContext(ctx),
                 new SharedPrefsUserAccessor(ctx), this);
-        backStack.add(initialView);
-
-        drawer.switchDrawerContent(initialView, initialView.getAllItems(), -1);
+        drawer.setItems(mainDrawerView.getAllItems());
+        drawer.setOnDrawerItemClickListener(mainDrawerView);
+        atMainView = true;
     }
 
-    public void addView(DrawerView drawerView) {
+    public void switchView(DrawerView drawerView) {
         Log.i("Drawer", drawerView.getAllItems().size() + " ");
-        backStack.push(drawerView);
         drawer.switchDrawerContent(drawerView, drawerView.getAllItems(), 0);
+        atMainView = false;
     }
 
     public void setBarHeader(String header) {
@@ -53,10 +51,9 @@ public class DrawerManager {
 
         if (!drawer.isDrawerOpen()) {
             return false;
-        } else if (backStack.size() > 1) {
-            backStack.pop();
-            DrawerView curView = backStack.peek();
-            drawer.switchDrawerContent(curView, curView.getAllItems(), -1);
+        } else if (!atMainView) {
+            drawer.resetDrawerContent();
+            atMainView = true;
             return true;
         } else {
             drawer.closeDrawer();

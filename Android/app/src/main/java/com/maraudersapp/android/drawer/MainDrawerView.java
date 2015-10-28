@@ -1,19 +1,16 @@
 package com.maraudersapp.android.drawer;
 
-import android.content.Context;
 import android.content.Intent;
 import android.util.Log;
 import android.view.View;
 
 import com.maraudersapp.android.LoginActivity;
-import com.maraudersapp.android.MapsActivity;
 import com.maraudersapp.android.R;
 import com.maraudersapp.android.datamodel.GroupInfo;
 import com.maraudersapp.android.datamodel.UserInfo;
 import com.maraudersapp.android.remote.RemoteCallback;
 import com.maraudersapp.android.remote.ServerComm;
 import com.maraudersapp.android.storage.SharedPrefsUserAccessor;
-import com.mikepenz.materialdrawer.Drawer;
 import com.mikepenz.materialdrawer.model.DividerDrawerItem;
 import com.mikepenz.materialdrawer.model.PrimaryDrawerItem;
 import com.mikepenz.materialdrawer.model.ToggleDrawerItem;
@@ -55,7 +52,8 @@ public class MainDrawerView extends DrawerView {
                                     Log.i(DRAWER_TAG, "Friend response received");
                                     DrawerView newView = new FriendsDrawerView(remote, storage,
                                             drawerManager, response);
-                                    drawerManager.addView(newView);
+                                    Log.i(DRAWER_TAG, response.toString());
+                                    drawerManager.switchView(newView);
                                 }
 
                                 @Override
@@ -82,7 +80,7 @@ public class MainDrawerView extends DrawerView {
                                 public void onSuccess(Set<GroupInfo> response) {
                                     DrawerView newView = new GroupsDrawerView(remote, storage,
                                             drawerManager, response);
-                                    drawerManager.addView(newView);
+                                    drawerManager.switchView(newView);
                                 }
 
                                 @Override

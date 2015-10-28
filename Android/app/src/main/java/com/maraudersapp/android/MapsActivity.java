@@ -30,6 +30,8 @@ import com.maraudersapp.android.drawer.DrawerManager;
 import com.maraudersapp.android.drawer.DrawerView;
 import com.maraudersapp.android.drawer.MainDrawerView;
 import com.maraudersapp.android.location.LocationUpdaterService;
+import com.maraudersapp.android.remote.ServerComm;
+import com.maraudersapp.android.remote.ServerCommManager;
 import com.maraudersapp.android.storage.SharedPrefsUserAccessor;
 import com.mikepenz.materialdrawer.AccountHeader;
 import com.mikepenz.materialdrawer.AccountHeaderBuilder;
@@ -60,6 +62,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     private Drawer mDrawer;
     private AccountHeader mHeader;
     private GoogleApiClient mGApi;
+    private ServerComm remote;
     private SharedPrefsUserAccessor storage;
     private DrawerManager drawerManager;
 
@@ -73,6 +76,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
 
+        remote = ServerCommManager.getCommForContext(getApplicationContext());
         storage = new SharedPrefsUserAccessor(getApplicationContext());
 
         initToolbarAndDrawer();
@@ -98,6 +102,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                 )
                 .build();
 
+        DrawerView main = new MainDrawerView(remote, storage, null);
         mDrawer = new DrawerBuilder()
             .withActivity(this)
             .withAccountHeader(mHeader)
