@@ -16,6 +16,7 @@ import android.view.View;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.widget.Toast;
 
 import com.cocosw.bottomsheet.BottomSheet;
 import com.google.android.gms.common.api.GoogleApiClient;
@@ -30,6 +31,7 @@ import com.maraudersapp.android.drawer.DrawerManager;
 import com.maraudersapp.android.drawer.DrawerView;
 import com.maraudersapp.android.drawer.MainDrawerView;
 import com.maraudersapp.android.location.LocationUpdaterService;
+import com.maraudersapp.android.remote.RemoteCallback;
 import com.maraudersapp.android.remote.ServerComm;
 import com.maraudersapp.android.remote.ServerCommManager;
 import com.maraudersapp.android.storage.SharedPrefsUserAccessor;
@@ -130,8 +132,28 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                 new BottomSheet.Builder(this).title("Create new...").sheet(R.menu.create).listener(new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
+                        Log.i(MAPS_ACTIVITY_TAG, "Sheet clicked: " + which);
                         switch (which) {
-
+                            case R.id.add_friend:
+                                new InputDialog(MapsActivity.this, "Send friend request by username", new InputDialog.OnTextEntered() {
+                                    @Override
+                                    public void onTextEntered(String text) {
+                                        if (text != null && !text.isEmpty()) {
+                                            sendFriendRequest(text);
+                                        }
+                                    }
+                                }).show();
+                                break;
+                            case R.id.create_group:
+                                new InputDialog(MapsActivity.this, "Create new group by name", new InputDialog.OnTextEntered() {
+                                    @Override
+                                    public void onTextEntered(String text) {
+                                        if (text != null && !text.isEmpty()) {
+                                            addGroup(text);
+                                        }
+                                    }
+                                }).show();
+                                break;
                         }
                     }
                 }).show();
@@ -179,5 +201,40 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         } else {
             Log.i(MAPS_ACTIVITY_TAG, "Last location null");
         }
+    }
+
+    private void sendFriendRequest(String username) {
+        Log.i(MAPS_ACTIVITY_TAG, "Sending request to: " + username);
+        remote.sendFriendRequest(storage.getUsername(), username,
+                new RemoteCallback<String>() {
+
+            @Override
+            public void onSuccess(String response) {
+                Toast.makeText(getApplicationContext(), "Friend request sent!", Toast.LENGTH_SHORT).show();
+            }
+
+            @Override
+            public void onFailure(int errorCode, String message) {
+                // TODO look at possible failures
+                Toast.makeText(getApplicationContext(), "Friend request could not be sent", Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+    private void addGroup(String groupName) {
+        Log.i(MAPS_ACTIVITY_TAG, "Creating group: " + groupName);
+        remote.createGroup(groupName, new RemoteCallback<String>() {
+
+            @Override
+            public void onSuccess(String response) {
+                Toast.makeText(getApplicationContext(), "Group created!", Toast.LENGTH_SHORT).show();
+            }
+
+            @Override
+            public void onFailure(int errorCode, String message) {
+                // TODO look at possible failures
+                Toast.makeText(getApplicationContext(), "Group could not be created", Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 }
