@@ -25,6 +25,10 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
+import com.maraudersapp.android.drawer.DrawerItem;
+import com.maraudersapp.android.drawer.DrawerManager;
+import com.maraudersapp.android.drawer.DrawerView;
+import com.maraudersapp.android.drawer.MainDrawerView;
 import com.maraudersapp.android.location.LocationUpdaterService;
 import com.maraudersapp.android.storage.SharedPrefsUserAccessor;
 import com.mikepenz.materialdrawer.AccountHeader;
@@ -57,12 +61,12 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     private AccountHeader mHeader;
     private GoogleApiClient mGApi;
     private SharedPrefsUserAccessor storage;
+    private DrawerManager drawerManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_maps);
-        initToolbarAndDrawer();
 
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
@@ -70,6 +74,8 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         mapFragment.getMapAsync(this);
 
         storage = new SharedPrefsUserAccessor(getApplicationContext());
+
+        initToolbarAndDrawer();
 
         LocationUpdaterService.scheduleLocationPolling(getApplicationContext());
     }
@@ -98,26 +104,9 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
             .withToolbar(mToolbar)
             .withTranslucentStatusBar(true)
             .withSelectedItem(-1) // So no default item is selected
-            .withDrawerItems(DrawerItem.getAllItems())
-            .withOnDrawerItemClickListener(new Drawer.OnDrawerItemClickListener() {
-                @Override
-                public boolean onItemClick(View view, int position, IDrawerItem drawerItem) {
-                    // DrawerItem position is exactly the order it is added,
-                    // so this is a clean way to handle clicks.
-
-                    System.out.println(position);
-                    if(position == 7) {
-                        Intent i = new Intent(view.getContext(), LoginActivity.class);
-                        i.putExtra("nullify", true);
-                        view.getContext().startActivity(i);
-                    }
-
-
-                    DrawerItem.values()[position - 1].handleClick(MapsActivity.this, getFragmentManager());
-                    return true;
-                }
-            })
             .build();
+
+        drawerManager = new DrawerManager(mDrawer, mToolbar, getApplicationContext());
     }
 
     @Override
@@ -149,9 +138,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     @Override
     public void onBackPressed() {
         //handle the back press :D close the drawer first and if the drawer is closed close the activity
-        if (mDrawer != null && mDrawer.isDrawerOpen()) {
-            mDrawer.closeDrawer();
-        } else {
+        if (!drawerManager.onBackPressed()) {
             moveTaskToBack(true);
         }
     }
@@ -186,89 +173,6 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
             mMap.animateCamera(center);
         } else {
             Log.i(MAPS_ACTIVITY_TAG, "Last location null");
-        }
-    }
-
-    /**
-     * Structure for holding each item in the Navigation Drawer (left panel).
-     *
-     * Adding a new item to the drawer is as easy as adding a new enum instance here.
-     * Just make sure that the identifier is unique. Items are added in the order they are
-     * specified. handleClick will be called when the item is clicked in the UI.
-     */
-    private enum DrawerItem {
-
-        YOURSELF(new PrimaryDrawerItem().withName(R.string.yourself_item_name).withIdentifier(1).withSelectable(false)) {
-
-            @Override
-            public void handleClick(Context context, FragmentManager fragmentManager) {
-                Log.i(MAPS_ACTIVITY_TAG, "Yourself clicked");
-            }
-        },
-        FRIENDS(new PrimaryDrawerItem().withName(R.string.friends_item_name).withIdentifier(2).withSelectable(false)) {
-
-            @Override
-            public void handleClick(Context context, FragmentManager fragmentManager) {
-                Log.i(MAPS_ACTIVITY_TAG, "Friends clicked");
-            }
-        },
-        GROUPS(new PrimaryDrawerItem().withName(R.string.groups_item_name).withIdentifier(3).withSelectable(false)) {
-            @Override
-            public void handleClick(Context context, FragmentManager fragmentManager) {
-                Log.i(MAPS_ACTIVITY_TAG, "Groups clicked");
-            }
-        },
-        SEPARATE(new DividerDrawerItem()) {
-            @Override
-            public void handleClick(Context context, FragmentManager fragmentManager) {}
-        },
-        INCOGNITO(new ToggleDrawerItem().withName(R.string.incognito_item_name).withIdentifier(4).withSelectable(false)) {
-
-            @Override
-            public void handleClick(Context context, FragmentManager fragmentManager) {
-                Log.i(MAPS_ACTIVITY_TAG, "Incognito clicked");
-            }
-        },
-        SETTINGS(new PrimaryDrawerItem().withName(R.string.settings_item_name).withIdentifier(5).withSelectable(false)) {
-
-            @Override
-            public void handleClick(Context context, FragmentManager fragmentManager) {
-                Log.i(MAPS_ACTIVITY_TAG, "Settings clicked");
-            }
-        },
-        LOGOUT(new PrimaryDrawerItem().withName(R.string.logout_item_name).withIdentifier(6).withSelectable(false)) {
-
-            @Override
-            public void handleClick(Context context, FragmentManager fragmentManager) { Log.i(MAPS_ACTIVITY_TAG, "Logout clicked"); }
-        };
-
-        // Actual DrawerItem to be drawn.
-        private IDrawerItem drawerItem;
-
-        /**
-         * Action to complete when the DrawerItem is clicked in the UI.
-         */
-        public abstract void handleClick(Context context, FragmentManager fragmentManager);
-
-        DrawerItem(IDrawerItem drawerItem) {
-            this.drawerItem = drawerItem;
-        }
-
-        /**
-         * @return all DrawerItems' IDrawerItem (what is actually given to the API).
-         */
-        public static ArrayList<IDrawerItem> getAllItems() {
-            ArrayList<IDrawerItem> toReturn = new ArrayList<>();
-            for (DrawerItem item : values()) {
-                toReturn.add(item.drawerItem);
-            }
-            return toReturn;
-        }
-
-        private static void loadFragment(Fragment fragment, FragmentManager fragmentManager) {
-            FragmentTransaction tx = fragmentManager.beginTransaction();
-            tx.replace(R.id.main_parent_view, fragment);
-            tx.commit();
         }
     }
 }
