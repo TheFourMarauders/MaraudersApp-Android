@@ -55,6 +55,7 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         storage = new SharedPrefsUserAccessor(getApplicationContext());
+        mapFragment = new MapsFragment();
 
         initToolbarAndDrawer();
         initMap();
@@ -113,15 +114,8 @@ public class MainActivity extends AppCompatActivity {
                         mDrawer.closeDrawer();
                     }
 
-                    if (position == 1) {
-                        FragmentTransaction tx = getSupportFragmentManager().beginTransaction();
-                        tx.hide(mapFragment);
-                        tx.replace(R.id.main_parent_view, new FriendsListFragment());
-                        tx.commit();
-                    }
 
-
-                    DrawerItem.values()[position - 1].handleClick(MainActivity.this, getSupportFragmentManager());
+                    DrawerItem.values()[position - 1].handleClick(MainActivity.this, getSupportFragmentManager(), mapFragment);
                     return true;
                 }
             })
@@ -156,11 +150,16 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     public void onBackPressed() {
+
+        int count = getSupportFragmentManager().getBackStackEntryCount();
+        Log.i(MAIN_ACTIVITY_TAG, "stack count: " + count);
         //handle the back press :D close the drawer first and if the drawer is closed close the activity
         if (mDrawer != null && mDrawer.isDrawerOpen()) {
             mDrawer.closeDrawer();
-        } else {
+        } else if (count == 0) {
             moveTaskToBack(true);
+        } else {
+            getSupportFragmentManager().popBackStack();
         }
     }
 
@@ -176,46 +175,50 @@ public class MainActivity extends AppCompatActivity {
         YOURSELF(new PrimaryDrawerItem().withName(R.string.yourself_item_name).withIdentifier(1).withSelectable(false)) {
 
             @Override
-            public void handleClick(Context context, FragmentManager fragmentManager) {
+            public void handleClick(Context context, FragmentManager fragmentManager, Fragment mapsFrag) {
                 Log.i(MAIN_ACTIVITY_TAG, "Yourself clicked");
             }
         },
         FRIENDS(new PrimaryDrawerItem().withName(R.string.friends_item_name).withIdentifier(2).withSelectable(false)) {
 
             @Override
-            public void handleClick(Context context, FragmentManager fragmentManager) {
-                loadFragment(new FriendsListFragment(), fragmentManager);
+            public void handleClick(Context context, FragmentManager fragmentManager, Fragment mapsFrag) {
+                fragmentManager.beginTransaction()
+                        .hide(mapsFrag)
+                        .add(R.id.main_parent_view, new FriendsListFragment(mapsFrag))
+                        .addToBackStack(null)
+                        .commit();
                 Log.i(MAIN_ACTIVITY_TAG, "Friends clicked");
             }
         },
         GROUPS(new PrimaryDrawerItem().withName(R.string.groups_item_name).withIdentifier(3).withSelectable(false)) {
             @Override
-            public void handleClick(Context context, FragmentManager fragmentManager) {
+            public void handleClick(Context context, FragmentManager fragmentManager, Fragment mapsFrag) {
                 Log.i(MAIN_ACTIVITY_TAG, "Groups clicked");
             }
         },
         SEPARATE(new DividerDrawerItem().withEnabled(false)) {
             @Override
-            public void handleClick(Context context, FragmentManager fragmentManager) {}
+            public void handleClick(Context context, FragmentManager fragmentManager, Fragment mapsFrag) {}
         },
         INCOGNITO(new ToggleDrawerItem().withName(R.string.incognito_item_name).withIdentifier(4).withSelectable(false)) {
 
             @Override
-            public void handleClick(Context context, FragmentManager fragmentManager) {
+            public void handleClick(Context context, FragmentManager fragmentManager, Fragment mapsFrag) {
                 Log.i(MAIN_ACTIVITY_TAG, "Incognito clicked");
             }
         },
         SETTINGS(new PrimaryDrawerItem().withName(R.string.settings_item_name).withIdentifier(5).withSelectable(false)) {
 
             @Override
-            public void handleClick(Context context, FragmentManager fragmentManager) {
+            public void handleClick(Context context, FragmentManager fragmentManager, Fragment mapsFrag) {
                 Log.i(MAIN_ACTIVITY_TAG, "Settings clicked");
             }
         },
         LOGOUT(new PrimaryDrawerItem().withName(R.string.logout_item_name).withIdentifier(6).withSelectable(false)) {
 
             @Override
-            public void handleClick(Context context, FragmentManager fragmentManager) { Log.i(MAIN_ACTIVITY_TAG, "Logout clicked"); }
+            public void handleClick(Context context, FragmentManager fragmentManager, Fragment mapsFrag) { Log.i(MAIN_ACTIVITY_TAG, "Logout clicked"); }
         };
 
         // Actual DrawerItem to be drawn.
@@ -224,7 +227,7 @@ public class MainActivity extends AppCompatActivity {
         /**
          * Action to complete when the DrawerItem is clicked in the UI.
          */
-        public abstract void handleClick(Context context, FragmentManager fragmentManager);
+        public abstract void handleClick(Context context, FragmentManager fragmentManager, Fragment mapsFrag);
 
         DrawerItem(IDrawerItem drawerItem) {
             this.drawerItem = drawerItem;

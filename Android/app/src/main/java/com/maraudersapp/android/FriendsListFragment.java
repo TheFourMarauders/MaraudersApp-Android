@@ -4,6 +4,8 @@ import android.content.Context;
 import android.content.res.Resources;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.app.ListFragment;
 import android.util.Log;
@@ -33,8 +35,11 @@ public class FriendsListFragment extends ListFragment {
     private static final String FRIENDS_LIST_TAG = "FRIENDS_LIST";
 
     private ArrayAdapter<FriendsListItem> mAdapter;
+    private Fragment mapFrag;
 
-    public FriendsListFragment
+    public FriendsListFragment(Fragment mapFrag) {
+        this.mapFrag = mapFrag;
+    }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -84,9 +89,8 @@ public class FriendsListFragment extends ListFragment {
     public void onListItemClick(ListView l, View v, int position, long id) {
         // retrieve theListView item
         // TODO clear back stack?
-        FriendsListItem item = mAdapter.getItem(position);
-        FragmentTransaction tx = getFragmentManager().beginTransaction();
-        tx.replace(R.id.main_parent_view, new MapsFragment());
-        tx.commit();
+        FragmentManager fm = getActivity().getSupportFragmentManager();
+        fm.beginTransaction().show(mapFrag).commit();
+        fm.popBackStack();
     }
 }
