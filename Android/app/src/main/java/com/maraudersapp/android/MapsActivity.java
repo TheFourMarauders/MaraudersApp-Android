@@ -31,6 +31,7 @@ import com.maraudersapp.android.drawer.DrawerManager;
 import com.maraudersapp.android.drawer.DrawerView;
 import com.maraudersapp.android.drawer.MainDrawerView;
 import com.maraudersapp.android.location.LocationUpdaterService;
+import com.maraudersapp.android.mapdrawing.PollingManager;
 import com.maraudersapp.android.remote.RemoteCallback;
 import com.maraudersapp.android.remote.ServerComm;
 import com.maraudersapp.android.remote.ServerCommManager;
@@ -62,11 +63,10 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
 
     private Toolbar mToolbar;
     private Drawer mDrawer;
-    private AccountHeader mHeader;
-    private GoogleApiClient mGApi;
     private ServerComm remote;
     private SharedPrefsUserAccessor storage;
     private DrawerManager drawerManager;
+    private PollingManager pollingManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -81,8 +81,6 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         remote = ServerCommManager.getCommForContext(getApplicationContext());
         storage = new SharedPrefsUserAccessor(getApplicationContext());
 
-        initToolbarAndDrawer();
-
         LocationUpdaterService.scheduleLocationPolling(getApplicationContext());
     }
 
@@ -95,7 +93,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         mToolbar.setTitle("Your History");
         setSupportActionBar(mToolbar);
 
-        mHeader = new AccountHeaderBuilder()
+        AccountHeader mHeader = new AccountHeaderBuilder()
                 .withActivity(this)
                 .withHeaderBackground(R.drawable.navigation_header)
                 .addProfiles(
@@ -104,7 +102,6 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                 )
                 .build();
 
-        DrawerView main = new MainDrawerView(remote, storage, null);
         mDrawer = new DrawerBuilder()
             .withActivity(this)
             .withAccountHeader(mHeader)
@@ -113,7 +110,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
             .withSelectedItem(-1) // So no default item is selected
             .build();
 
-        drawerManager = new DrawerManager(mDrawer, mToolbar, getApplicationContext());
+        drawerManager = new DrawerManager(mDrawer, mToolbar, getApplicationContext(), pollingManager);
     }
 
     @Override
@@ -186,6 +183,8 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
         mMap.setMyLocationEnabled(true);
+        pollingManager = new PollingManager(getApplicationContext(), mMap);
+        initToolbarAndDrawer();
 
         LocationManager locationManager = (LocationManager) this.getSystemService(Context.LOCATION_SERVICE);
         Location loc = locationManager.getLastKnownLocation(LocationManager.PASSIVE_PROVIDER);

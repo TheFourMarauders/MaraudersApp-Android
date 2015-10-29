@@ -6,6 +6,7 @@ import android.view.View;
 
 import com.maraudersapp.android.R;
 import com.maraudersapp.android.datamodel.UserInfo;
+import com.maraudersapp.android.mapdrawing.PollingManager;
 import com.maraudersapp.android.remote.RemoteCallback;
 import com.maraudersapp.android.remote.ServerComm;
 import com.maraudersapp.android.remote.ServerCommManager;
@@ -28,17 +29,21 @@ public class FriendsDrawerView extends DrawerView {
     private List<DrawerItem> drawerItems;
 
     public FriendsDrawerView(ServerComm remote, SharedPrefsUserAccessor storage,
-                             DrawerManager drawerManager, Set<UserInfo> users) {
-        super(remote, storage, drawerManager);
+                             final DrawerManager drawerManager, PollingManager pm, final Context ctx, Set<UserInfo> users) {
+        super(remote, storage, drawerManager, pm, ctx);
 
         List<DrawerItem> items = new ArrayList<>();
         // TODO back arrow
         for (UserInfo user : users) {
+            final String username = user.getUsername();
             items.add(new DrawerItem(new PrimaryDrawerItem().withName(user.getFirstName() + " " + user.getLastName())) {
                 @Override
                 public void handleClick(View view, IDrawerItem drawerItem) {
                     Log.i(DRAWER_TAG, "Specific friends clicked");
                     // TODO
+                    drawerManager.onBackPressed();
+                    drawerManager.onBackPressed();
+                    pollingManager.changePoller(pollingManager.newFriendPoller(username, ctx));
                 }
             });
         }

@@ -12,6 +12,10 @@ import java.util.TimeZone;
  */
 public final class TimeUtil {
 
+    public synchronized static long getCurrentTimeInMillis() {
+        return new Date().getTime();
+    }
+
     public synchronized static String getCurrentTime() {
         TimeZone tz = TimeZone.getTimeZone("UTC");
         DateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:ss:mm'Z'");

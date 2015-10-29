@@ -1,9 +1,11 @@
 package com.maraudersapp.android.drawer;
 
+import android.content.Context;
 import android.view.View;
 
 import com.maraudersapp.android.datamodel.GroupInfo;
 import com.maraudersapp.android.datamodel.UserInfo;
+import com.maraudersapp.android.mapdrawing.PollingManager;
 import com.maraudersapp.android.remote.ServerComm;
 import com.maraudersapp.android.storage.SharedPrefsUserAccessor;
 import com.mikepenz.materialdrawer.model.PrimaryDrawerItem;
@@ -21,8 +23,8 @@ public class GroupsDrawerView extends DrawerView {
     private List<DrawerItem> drawerItems;
 
     public GroupsDrawerView(ServerComm remote, SharedPrefsUserAccessor storage,
-                             DrawerManager drawerManager, Set<GroupInfo> groups) {
-        super(remote, storage, drawerManager);
+                             DrawerManager drawerManager, PollingManager pm, Context ctx, Set<GroupInfo> groups) {
+        super(remote, storage, drawerManager, pm, ctx);
 
         List<DrawerItem> items = new ArrayList<>();
 

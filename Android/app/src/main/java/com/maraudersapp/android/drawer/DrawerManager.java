@@ -4,6 +4,8 @@ import android.content.Context;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 
+import com.maraudersapp.android.mapdrawing.Poller;
+import com.maraudersapp.android.mapdrawing.PollingManager;
 import com.maraudersapp.android.remote.ServerCommManager;
 import com.maraudersapp.android.storage.SharedPrefsUserAccessor;
 import com.mikepenz.materialdrawer.Drawer;
@@ -22,12 +24,12 @@ public class DrawerManager {
 
     private boolean atMainView;
 
-    public DrawerManager(Drawer drawer, Toolbar toolbar, Context ctx) {
+    public DrawerManager(Drawer drawer, Toolbar toolbar, Context ctx, PollingManager pm) {
         this.drawer = drawer;
         this.toolbar = toolbar;
 
         DrawerView mainDrawerView = new MainDrawerView(ServerCommManager.getCommForContext(ctx),
-                new SharedPrefsUserAccessor(ctx), this);
+                new SharedPrefsUserAccessor(ctx), this, pm, ctx);
         drawer.setItems(mainDrawerView.getAllItems());
         drawer.setOnDrawerItemClickListener(mainDrawerView);
         atMainView = true;
