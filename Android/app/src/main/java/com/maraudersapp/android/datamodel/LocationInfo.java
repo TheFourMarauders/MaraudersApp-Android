@@ -61,4 +61,13 @@ public class LocationInfo {
     public int hashCode() {
         return getTime().hashCode();
     }
+
+    @Override
+    public String toString() {
+        return "LocationInfo{" +
+                "latitude=" + latitude +
+                ", longitude=" + longitude +
+                ", time='" + time + '\'' +
+                '}';
+    }
 }

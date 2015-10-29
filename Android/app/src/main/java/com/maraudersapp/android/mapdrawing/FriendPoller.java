@@ -40,6 +40,7 @@ public class FriendPoller extends Poller {
                     public void onSuccess(List<LocationInfo> response) {
                         Log.i(PollingManager.POLL_TAG, "Locations received for " + username
                                 + ". Size: " + response.size());
+                        Log.i(PollingManager.POLL_TAG, "Locations: " + username + ":" + response);
                         if (!response.isEmpty()) {
                             removeAllMarkings();
                             for (LocationInfo locInfo : response) {

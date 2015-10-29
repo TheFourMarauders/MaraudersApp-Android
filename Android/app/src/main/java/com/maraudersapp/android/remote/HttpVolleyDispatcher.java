@@ -107,7 +107,7 @@ public class HttpVolleyDispatcher implements ServerComm {
         GetRequest<List<LocationInfo>> req = new GetRequest<>(callback,
                 conf.getLocationsUrl(username, TimeUtil.dateToString(start), TimeUtil.dateToString(end)),
                 new ObjectMapper().getTypeFactory().constructCollectionType(ArrayList.class, LocationInfo.class));
-
+        Log.d("remote location", conf.getLocationsUrl(username, TimeUtil.dateToString(start), TimeUtil.dateToString(end)));
         queue.add(req);
     }
 
