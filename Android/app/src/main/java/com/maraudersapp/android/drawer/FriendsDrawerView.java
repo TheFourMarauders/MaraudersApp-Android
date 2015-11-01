@@ -34,15 +34,15 @@ public class FriendsDrawerView extends DrawerView {
 
         List<DrawerItem> items = new ArrayList<>();
         // TODO back arrow
-        for (UserInfo user : users) {
+        for (final UserInfo user : users) {
             final String username = user.getUsername();
             items.add(new DrawerItem(new PrimaryDrawerItem().withName(user.getFirstName() + " " + user.getLastName())) {
                 @Override
                 public void handleClick(View view, IDrawerItem drawerItem) {
                     Log.i(DRAWER_TAG, "Specific friends clicked");
-                    // TODO
                     drawerManager.onBackPressed();
                     drawerManager.onBackPressed();
+                    drawerManager.setBarHeader(user.getFirstName() + " " + user.getLastName() + "'s History");
                     pollingManager.changePoller(pollingManager.newFriendPoller(username, ctx));
                 }
             });

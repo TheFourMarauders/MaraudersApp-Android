@@ -5,6 +5,7 @@ import android.os.Handler;
 import android.util.Log;
 
 import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
@@ -41,10 +42,19 @@ public class GroupPoller extends Poller {
                     public void onSuccess(Map<String, List<LocationInfo>> response) {
                         if (!response.isEmpty()) {
                             removeAllMarkings();
-//                            for (LocationInfo locInfo : response) {
-//                                currentMarkers.add(gMap.addMarker(new MarkerOptions().position(
-//                                        new LatLng(locInfo.getLatitude(), locInfo.getLongitude()))));
-//                            }
+                            float hue = response.size() != 1 ? 359.0f / response.size() : DEFAULT_HUE;
+                            float hStep = hue;
+                            for (Map.Entry<String, List<LocationInfo>> user : response.entrySet()) {
+                                float opacity = 1.0f / response.size();
+                                float oStep = opacity;
+                                for (LocationInfo locInfo : user.getValue()) {
+                                    currentMarkers.add(gMap.addMarker(new MarkerOptions().position(
+                                            new LatLng(locInfo.getLatitude(), locInfo.getLongitude()))
+                                            .alpha(opacity).icon(BitmapDescriptorFactory.defaultMarker(hue))));
+                                    opacity += oStep;
+                                }
+                                hue += hStep;
+                            }
                         }
                     }
 

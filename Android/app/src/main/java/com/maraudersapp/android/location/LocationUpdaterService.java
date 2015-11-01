@@ -80,6 +80,16 @@ public  final class LocationUpdaterService extends Service implements LocationLi
         }
     }
 
+    public static void stopLocationPolling(Context context) {
+        final AlarmManager alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
+        // Same intents will overwrite any existing previous one :)
+        final PendingIntent wakeupIntent = PendingIntent.getService(context, 0,
+                new Intent(context, LocationUpdaterService.class), PendingIntent.FLAG_UPDATE_CURRENT);
+
+        Log.i(LocationConstants.LOG_TAG, "Stopping location updates");
+        alarmManager.cancel(wakeupIntent);
+    }
+
     @Override
     public void onCreate() {
         super.onCreate();

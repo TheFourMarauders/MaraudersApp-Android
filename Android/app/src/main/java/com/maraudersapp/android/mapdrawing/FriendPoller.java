@@ -5,6 +5,7 @@ import android.os.Handler;
 import android.util.Log;
 
 import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
@@ -40,12 +41,15 @@ public class FriendPoller extends Poller {
                     public void onSuccess(List<LocationInfo> response) {
                         Log.i(PollingManager.POLL_TAG, "Locations received for " + username
                                 + ". Size: " + response.size());
-                        Log.i(PollingManager.POLL_TAG, "Locations: " + username + ":" + response);
                         if (!response.isEmpty()) {
                             removeAllMarkings();
+                            float opacity = 1.0f / response.size();
+                            float step = opacity;
                             for (LocationInfo locInfo : response) {
                                 currentMarkers.add(gMap.addMarker(new MarkerOptions().position(
-                                        new LatLng(locInfo.getLatitude(), locInfo.getLongitude()))));
+                                        new LatLng(locInfo.getLatitude(), locInfo.getLongitude()))
+                                        .alpha(opacity).icon(BitmapDescriptorFactory.defaultMarker(DEFAULT_HUE))));
+                                opacity += step;
                             }
                         }
                     }

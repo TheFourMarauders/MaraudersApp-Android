@@ -23,17 +23,20 @@ public class GroupsDrawerView extends DrawerView {
     private List<DrawerItem> drawerItems;
 
     public GroupsDrawerView(ServerComm remote, SharedPrefsUserAccessor storage,
-                             DrawerManager drawerManager, PollingManager pm, Context ctx, Set<GroupInfo> groups) {
+                             final DrawerManager drawerManager, PollingManager pm, final Context ctx, Set<GroupInfo> groups) {
         super(remote, storage, drawerManager, pm, ctx);
 
         List<DrawerItem> items = new ArrayList<>();
 
         // TODO back arrow
-        for (GroupInfo group : groups) {
+        for (final GroupInfo group : groups) {
             items.add(new DrawerItem(new PrimaryDrawerItem().withName(group.getName())){
                 @Override
                 public void handleClick(View view, IDrawerItem drawerItem) {
-                    // TODO
+                    drawerManager.onBackPressed();
+                    drawerManager.onBackPressed();
+                    drawerManager.setBarHeader(group.getName() + "'s Group History");
+                    pollingManager.changePoller(pollingManager.newGroupPoller(group.get_id(), ctx));
                 }
             });
         }

@@ -73,13 +73,16 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_maps);
 
+        remote = ServerCommManager.getCommForContext(getApplicationContext());
+        storage = new SharedPrefsUserAccessor(getApplicationContext());
+
+        pollingManager = new PollingManager();
+        initToolbarAndDrawer();
+
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
-
-        remote = ServerCommManager.getCommForContext(getApplicationContext());
-        storage = new SharedPrefsUserAccessor(getApplicationContext());
 
         LocationUpdaterService.scheduleLocationPolling(getApplicationContext());
     }
@@ -183,8 +186,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
         mMap.setMyLocationEnabled(true);
-        pollingManager = new PollingManager(getApplicationContext(), mMap);
-        initToolbarAndDrawer();
+        pollingManager.setGoogleMap(mMap, getApplicationContext());
 
         LocationManager locationManager = (LocationManager) this.getSystemService(Context.LOCATION_SERVICE);
         Location loc = locationManager.getLastKnownLocation(LocationManager.PASSIVE_PROVIDER);
@@ -200,6 +202,18 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         } else {
             Log.i(MAPS_ACTIVITY_TAG, "Last location null");
         }
+    }
+
+    @Override
+    public void onPause() {
+        pollingManager.stopPolling();
+        super.onPause();
+    }
+
+    @Override
+    public void onResume() {
+        pollingManager.continuePolling();
+        super.onResume();
     }
 
     private void sendFriendRequest(String username) {

@@ -19,12 +19,16 @@ public class PollingManager {
 
     private Poller currentPoller;
     private final Handler pollHandler;
-    private final GoogleMap googleMap;
+    private GoogleMap googleMap;
 
-    public PollingManager(Context ctx, GoogleMap googleMap) {
-        currentPoller = newUserPoller(ctx);
+    public PollingManager() {
         pollHandler = new Handler();
-        this.googleMap = googleMap;
+    }
+
+    public void setGoogleMap(GoogleMap map, Context ctx) {
+        googleMap = map;
+        currentPoller = newUserPoller(ctx);
+        pollHandler.postDelayed(currentPoller, 0);
     }
 
     public void changePoller(Poller poller) {
@@ -44,6 +48,10 @@ public class PollingManager {
 
     public Poller newFriendPoller(String username, Context ctx) {
         return new FriendPoller(pollHandler, googleMap, ctx, username);
+    }
+
+    public Poller newGroupPoller(String id, Context ctx) {
+        return new GroupPoller(pollHandler, googleMap, ctx, id);
     }
 
     public Poller newUserPoller(Context ctx) {

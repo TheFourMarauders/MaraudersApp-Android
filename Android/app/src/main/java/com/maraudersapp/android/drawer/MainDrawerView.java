@@ -9,6 +9,7 @@ import com.maraudersapp.android.LoginActivity;
 import com.maraudersapp.android.R;
 import com.maraudersapp.android.datamodel.GroupInfo;
 import com.maraudersapp.android.datamodel.UserInfo;
+import com.maraudersapp.android.location.LocationUpdaterService;
 import com.maraudersapp.android.mapdrawing.PollingManager;
 import com.maraudersapp.android.remote.RemoteCallback;
 import com.maraudersapp.android.remote.ServerComm;
@@ -35,6 +36,9 @@ public class MainDrawerView extends DrawerView {
                 @Override
                 public void handleClick(View view, IDrawerItem drawerItem) {
                     Log.i(DRAWER_TAG, "Yourself clicked");
+                    drawerManager.setBarHeader("Your History");
+                    drawerManager.onBackPressed();
+                    pollingManager.changePoller(pollingManager.newUserPoller(ctx));
                 }
 
             },
@@ -130,9 +134,7 @@ public class MainDrawerView extends DrawerView {
                 @Override
                 public void handleClick(View view, IDrawerItem drawerItem) {
                     Log.i(DRAWER_TAG, "Logout clicked");
-                    Intent i = new Intent(view.getContext(), LoginActivity.class);
-                    i.putExtra("nullify", true);
-                    view.getContext().startActivity(i);
+                    logout(view);
                 }
 
             },
@@ -152,6 +154,14 @@ public class MainDrawerView extends DrawerView {
     public boolean onItemClick(View view, int position, IDrawerItem drawerItem) {
         drawerItems[position - 1].handleClick(view, drawerItem);
         return true;
+    }
+
+    private void logout(View view) {
+        LocationUpdaterService.stopLocationPolling(ctx);
+        pollingManager.stopPolling();
+        Intent i = new Intent(view.getContext(), LoginActivity.class);
+        i.putExtra("nullify", true);
+        view.getContext().startActivity(i);
     }
 
 }
