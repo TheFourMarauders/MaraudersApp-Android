@@ -1,9 +1,18 @@
 package com.maraudersapp.android.mapdrawing;
 
+import android.app.Activity;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.os.Handler;
+import android.util.Log;
+import android.widget.Toast;
 
+import com.cocosw.bottomsheet.BottomSheet;
 import com.google.android.gms.maps.GoogleMap;
+import com.maraudersapp.android.InputDialog;
+import com.maraudersapp.android.MapsActivity;
+import com.maraudersapp.android.R;
+import com.maraudersapp.android.remote.RemoteCallback;
 
 import java.util.logging.LogRecord;
 
@@ -46,12 +55,16 @@ public class PollingManager {
         pollHandler.postDelayed(currentPoller, 0);
     }
 
+    public void onPlusPressed(Activity ctx) {
+        currentPoller.onPlusPressed(ctx);
+    }
+
     public Poller newFriendPoller(String username, Context ctx) {
         return new FriendPoller(pollHandler, googleMap, ctx, username);
     }
 
-    public Poller newGroupPoller(String id, Context ctx) {
-        return new GroupPoller(pollHandler, googleMap, ctx, id);
+    public Poller newGroupPoller(String id, String groupName, Context ctx) {
+        return new GroupPoller(pollHandler, googleMap, ctx, id, groupName);
     }
 
     public Poller newUserPoller(Context ctx) {

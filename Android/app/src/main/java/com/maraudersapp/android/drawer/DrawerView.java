@@ -2,9 +2,13 @@ package com.maraudersapp.android.drawer;
 
 import android.app.FragmentManager;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.util.Log;
 import android.view.View;
 
+import com.cocosw.bottomsheet.BottomSheet;
+import com.maraudersapp.android.InputDialog;
+import com.maraudersapp.android.R;
 import com.maraudersapp.android.mapdrawing.PollingManager;
 import com.maraudersapp.android.remote.ServerComm;
 import com.maraudersapp.android.remote.ServerCommManager;
