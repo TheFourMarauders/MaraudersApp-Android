@@ -36,7 +36,8 @@ public class GroupsDrawerView extends DrawerView {
                     drawerManager.onBackPressed();
                     drawerManager.onBackPressed();
                     drawerManager.setBarHeader(group.getName() + "'s Group History");
-                    pollingManager.changePoller(pollingManager.newGroupPoller(group.get_id(), group.getName(), ctx));
+                    pollingManager.changePoller(
+                            pollingManager.newGroupPoller(group.get_id(), group.getName(), group.getMembers(), ctx));
                 }
             });
         }

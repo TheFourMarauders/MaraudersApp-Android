@@ -14,6 +14,7 @@ import com.maraudersapp.android.MapsActivity;
 import com.maraudersapp.android.R;
 import com.maraudersapp.android.remote.RemoteCallback;
 
+import java.util.Collection;
 import java.util.logging.LogRecord;
 
 /**
@@ -63,8 +64,8 @@ public class PollingManager {
         return new FriendPoller(pollHandler, googleMap, ctx, username);
     }
 
-    public Poller newGroupPoller(String id, String groupName, Context ctx) {
-        return new GroupPoller(pollHandler, googleMap, ctx, id, groupName);
+    public Poller newGroupPoller(String id, String groupName, Collection<String> members, Context ctx) {
+        return new GroupPoller(pollHandler, googleMap, ctx, id, groupName, members);
     }
 
     public Poller newUserPoller(Context ctx) {
