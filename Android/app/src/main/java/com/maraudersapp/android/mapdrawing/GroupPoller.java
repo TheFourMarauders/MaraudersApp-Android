@@ -22,6 +22,7 @@ import com.maraudersapp.android.util.ServerUtil;
 import com.maraudersapp.android.util.TimeUtil;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -35,10 +36,12 @@ public class GroupPoller extends Poller {
     private final String groupId;
     private final String groupName;
     private List<Marker> currentMarkers;
+    private final Collection<String> members;
 
-    GroupPoller(Handler handler, GoogleMap googleMap, Context ctx, String groupId, String groupName) {
+    GroupPoller(Handler handler, GoogleMap googleMap, Context ctx, String groupId, String groupName, Collection<String> members) {
         super(handler, googleMap, ctx);
         this.groupId = groupId;
+        this.members = members;
         this.groupName = groupName;
         currentMarkers = new ArrayList<>();
     }
@@ -120,7 +123,9 @@ public class GroupPoller extends Poller {
         // Populate pop-up menu
         for (int i = 0; i < friends.size(); i++) {
             UserInfo user = friends.get(i);
-            menu.add(Menu.NONE, i, Menu.NONE, user.getFirstName() + " " + user.getLastName());
+            if (!members.contains(user.getUsername())) {
+                menu.add(Menu.NONE, i, Menu.NONE, user.getFirstName() + " " + user.getLastName());
+            }
         }
 
         sheet.show();
