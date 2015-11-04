@@ -55,11 +55,24 @@ public class MainDrawerView extends DrawerView {
                             new RemoteCallback<Set<UserInfo>>() {
                                 @Override
                                 public void onSuccess(Set<UserInfo> response) {
-                                    Log.i(DRAWER_TAG, "Friend response received");
-                                    DrawerView newView = new FriendsDrawerView(remote, storage,
-                                            drawerManager, pollingManager, ctx, response);
-                                    Log.i(DRAWER_TAG, response.toString());
-                                    drawerManager.switchView(newView);
+                                    final Set<UserInfo> friends = response;
+                                    remote.getFriendRequestsFor(storage.getUsername(), new RemoteCallback<Set<UserInfo>>() {
+                                                @Override
+                                                public void onSuccess(Set<UserInfo> response) {
+                                                    final DrawerView newView = new FriendsDrawerView(remote, storage,
+                                                            drawerManager, pollingManager, ctx, friends, response);
+
+                                                    Log.i(DRAWER_TAG, "Friend response received");
+                                                    Log.i(DRAWER_TAG, response.toString());
+                                                    drawerManager.switchView(newView);
+                                                }
+
+                                                @Override
+                                                public void onFailure(int errorCode, String message) {
+                                                    // TODO
+                                                }
+                                            }
+                                    );
                                 }
 
                                 @Override

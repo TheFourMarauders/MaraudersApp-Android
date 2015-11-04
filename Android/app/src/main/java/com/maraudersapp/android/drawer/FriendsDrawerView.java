@@ -14,6 +14,7 @@ import com.maraudersapp.android.storage.SharedPrefsUserAccessor;
 import com.mikepenz.materialdrawer.Drawer;
 import com.mikepenz.materialdrawer.model.DividerDrawerItem;
 import com.mikepenz.materialdrawer.model.PrimaryDrawerItem;
+import com.mikepenz.materialdrawer.model.SecondaryDrawerItem;
 import com.mikepenz.materialdrawer.model.ToggleDrawerItem;
 import com.mikepenz.materialdrawer.model.interfaces.IDrawerItem;
 
@@ -28,13 +29,14 @@ public class FriendsDrawerView extends DrawerView {
 
     private List<DrawerItem> drawerItems;
 
-    public FriendsDrawerView(ServerComm remote, SharedPrefsUserAccessor storage,
-                             final DrawerManager drawerManager, PollingManager pm, final Context ctx, Set<UserInfo> users) {
+    public FriendsDrawerView(final ServerComm remote, final SharedPrefsUserAccessor storage,
+                             final DrawerManager drawerManager, PollingManager pm, final Context ctx,
+                             Set<UserInfo> friends, Set<UserInfo> friendRequests) {
         super(remote, storage, drawerManager, pm, ctx);
 
-        List<DrawerItem> items = new ArrayList<>();
+        final List<DrawerItem> items = new ArrayList<>();
         // TODO back arrow
-        for (final UserInfo user : users) {
+        for (final UserInfo user : friends) {
             final String username = user.getUsername();
             items.add(new DrawerItem(new PrimaryDrawerItem().withName(user.getFirstName() + " " + user.getLastName())) {
                 @Override
@@ -44,6 +46,51 @@ public class FriendsDrawerView extends DrawerView {
                     drawerManager.onBackPressed();
                     drawerManager.setBarHeader(user.getFirstName() + " " + user.getLastName() + "'s History");
                     pollingManager.changePoller(pollingManager.newFriendPoller(username, ctx));
+                }
+            });
+        }
+
+        items.add(new DrawerItem(new DividerDrawerItem().withEnabled(false)) {
+            @Override
+            public void handleClick(View view, IDrawerItem drawerItem) {}
+        });
+
+        items.add(new DrawerItem(new SecondaryDrawerItem().withEnabled(false).withName("Friend Requests")) {
+            @Override
+            public void handleClick(View view, IDrawerItem drawerItem) {}
+        });
+
+        for (final UserInfo request : friendRequests) {
+            final String username = request.getUsername();
+            items.add(new DrawerItem(new PrimaryDrawerItem().withName(request.getFirstName() + " " + request.getLastName())) {
+                @Override
+                public void handleClick(View view, final IDrawerItem drawerItem) {
+                    Log.i(DRAWER_TAG, "Friend Request clicked");
+                    final DrawerItem outer = this;
+                    remote.acceptFriendRequest(storage.getUsername(), username, new RemoteCallback<String>() {
+                        @Override
+                        public void onSuccess(String response) {
+                            items.remove(outer);
+                            items.add(0, new DrawerItem(new PrimaryDrawerItem().withName(request.getFirstName() + " " + request.getLastName())) {
+
+                                @Override
+                                public void handleClick(View view, IDrawerItem drawerItem) {
+                                    Log.i(DRAWER_TAG, "Specific friends clicked");
+                                    drawerManager.onBackPressed();
+                                    drawerManager.onBackPressed();
+                                    drawerManager.setBarHeader(request.getFirstName() + " " + request.getLastName());
+                                    pollingManager.changePoller(pollingManager.newFriendPoller(username, ctx));
+                                }
+                            });
+                            drawerManager.onBackPressed();
+                            drawerManager.switchView(FriendsDrawerView.this);
+                        }
+
+                        @Override
+                        public void onFailure(int errorCode, String message) {
+
+                        }
+                    });
                 }
             });
         }
