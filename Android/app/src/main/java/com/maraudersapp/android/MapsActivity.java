@@ -1,11 +1,7 @@
 package com.maraudersapp.android;
 
-import android.app.Fragment;
 import android.app.FragmentManager;
-import android.app.FragmentTransaction;
 import android.content.Context;
-import android.content.DialogInterface;
-import android.content.Intent;
 import android.location.Location;
 import android.location.LocationManager;
 import android.os.Bundle;
@@ -16,10 +12,7 @@ import android.view.View;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
-import android.widget.Toast;
 
-import com.cocosw.bottomsheet.BottomSheet;
-import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -29,7 +22,7 @@ import com.google.android.gms.maps.model.LatLng;
 import com.maraudersapp.android.drawer.DrawerItem;
 import com.maraudersapp.android.drawer.DrawerManager;
 import com.maraudersapp.android.drawer.DrawerView;
-import com.maraudersapp.android.drawer.MainDrawerView;
+import com.maraudersapp.android.StateFragment.InstanceData;
 import com.maraudersapp.android.location.LocationUpdaterService;
 import com.maraudersapp.android.mapdrawing.PollingManager;
 import com.maraudersapp.android.remote.RemoteCallback;
@@ -57,9 +50,11 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
 
     // Logging within this class.
     private static final String MAPS_ACTIVITY_TAG = "MAPS_TAG";
+    private static final String STATE_TAG = "DATA";
 
 
     private GoogleMap mMap;
+    private StateFragment stateFragment;
 
     private Toolbar mToolbar;
     private Drawer mDrawer;
@@ -76,8 +71,18 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         remote = ServerCommManager.getCommForContext(getApplicationContext());
         storage = new SharedPrefsUserAccessor(getApplicationContext());
 
-        pollingManager = new PollingManager();
-        initToolbarAndDrawer();
+        FragmentManager fm = getFragmentManager();
+        stateFragment = (StateFragment) fm.findFragmentByTag(STATE_TAG);
+
+        // create the fragment and data the first time
+        if (stateFragment == null) {
+            // add the fragment
+            stateFragment = new StateFragment();
+            fm.beginTransaction().add(stateFragment, STATE_TAG).commit();
+            stateFragment.setData(initializeState());
+        }
+
+        loadInstanceState(stateFragment);
 
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
@@ -87,13 +92,25 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         LocationUpdaterService.scheduleLocationPolling(getApplicationContext());
     }
 
+    private InstanceData initializeState() {
+        pollingManager = new PollingManager();
+        return new InstanceData("Your History", pollingManager);
+    }
+
+    private void loadInstanceState(StateFragment state) {
+        InstanceData stateData = state.getData();
+        pollingManager = stateData.getPollingManager();
+        initToolbarAndDrawer(stateData.getTitle());
+        // TODO will poll continue to poll?
+    }
+
     /**
      * Uses MaterialDrawer (https://github.com/mikepenz/MaterialDrawer)
      * to create a Navigation Drawer and Toolbar to host it.
      */
-    private void initToolbarAndDrawer() {
+    private void initToolbarAndDrawer(String title) {
         mToolbar = (Toolbar) findViewById(R.id.toolbar);
-        mToolbar.setTitle("Your History");
+        mToolbar.setTitle(title);
         setSupportActionBar(mToolbar);
 
         AccountHeader mHeader = new AccountHeaderBuilder()
@@ -185,5 +202,11 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     public void onResume() {
         pollingManager.continuePolling();
         super.onResume();
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        stateFragment.setData(new InstanceData(mToolbar.getTitle().toString(), pollingManager));
     }
 }
