@@ -1,52 +1,33 @@
 package com.maraudersapp.android;
 
-import android.app.Fragment;
-import android.app.FragmentManager;
-import android.app.FragmentTransaction;
 import android.content.Context;
-import android.content.DialogInterface;
-import android.content.Intent;
 import android.location.Location;
 import android.location.LocationManager;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
-import android.view.View;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
-import android.widget.Toast;
 
-import com.cocosw.bottomsheet.BottomSheet;
-import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
-import com.maraudersapp.android.drawer.DrawerItem;
 import com.maraudersapp.android.drawer.DrawerManager;
-import com.maraudersapp.android.drawer.DrawerView;
-import com.maraudersapp.android.drawer.MainDrawerView;
 import com.maraudersapp.android.location.LocationUpdaterService;
 import com.maraudersapp.android.mapdrawing.PollingManager;
-import com.maraudersapp.android.remote.RemoteCallback;
 import com.maraudersapp.android.remote.ServerComm;
 import com.maraudersapp.android.remote.ServerCommManager;
-import com.maraudersapp.android.storage.SharedPrefsUserAccessor;
+import com.maraudersapp.android.storage.SharedPrefsAccessor;
 import com.mikepenz.materialdrawer.AccountHeader;
 import com.mikepenz.materialdrawer.AccountHeaderBuilder;
 import com.mikepenz.materialdrawer.Drawer;
 import com.mikepenz.materialdrawer.DrawerBuilder;
-import com.mikepenz.materialdrawer.model.DividerDrawerItem;
-import com.mikepenz.materialdrawer.model.PrimaryDrawerItem;
 import com.mikepenz.materialdrawer.model.ProfileDrawerItem;
-import com.mikepenz.materialdrawer.model.ToggleDrawerItem;
-import com.mikepenz.materialdrawer.model.interfaces.IDrawerItem;
-
-import java.util.ArrayList;
 
 /**
  * Main activity that displays the map that the users can interact with.
@@ -64,7 +45,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     private Toolbar mToolbar;
     private Drawer mDrawer;
     private ServerComm remote;
-    private SharedPrefsUserAccessor storage;
+    private SharedPrefsAccessor storage;
     private DrawerManager drawerManager;
     private PollingManager pollingManager;
 
@@ -74,7 +55,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         setContentView(R.layout.activity_maps);
 
         remote = ServerCommManager.getCommForContext(getApplicationContext());
-        storage = new SharedPrefsUserAccessor(getApplicationContext());
+        storage = new SharedPrefsAccessor(getApplicationContext());
 
         pollingManager = new PollingManager();
         initToolbarAndDrawer();

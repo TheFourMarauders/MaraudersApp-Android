@@ -14,7 +14,7 @@ import com.maraudersapp.android.datamodel.UserInfo;
 import com.maraudersapp.android.remote.RemoteCallback;
 import com.maraudersapp.android.remote.ServerComm;
 import com.maraudersapp.android.remote.ServerCommManager;
-import com.maraudersapp.android.storage.SharedPrefsUserAccessor;
+import com.maraudersapp.android.storage.SharedPrefsAccessor;
 
 import java.util.Set;
 
@@ -31,7 +31,7 @@ public class LoginActivity extends AppCompatActivity {
     boolean isInitial = true;
     boolean isPreferencesNull = false;
     private ServerComm remote;
-    private SharedPrefsUserAccessor storage;
+    private SharedPrefsAccessor storage;
 
     @InjectView(R.id.input_username_login) EditText usernameText;
     @InjectView(R.id.input_password_login) EditText passwordText;
@@ -46,7 +46,7 @@ public class LoginActivity extends AppCompatActivity {
 
         Intent i = getIntent();
         mustNullify = i.getBooleanExtra("nullify", false);
-        storage = new SharedPrefsUserAccessor(getApplicationContext());
+        storage = new SharedPrefsAccessor(getApplicationContext());
         if(mustNullify) {
             storage.clearCredentials();
             isInitial = false;
@@ -81,7 +81,7 @@ public class LoginActivity extends AppCompatActivity {
     public void onResume() {
         super.onResume();
         remote = ServerCommManager.getCommForContext(getApplicationContext());
-        storage = new SharedPrefsUserAccessor(getApplicationContext());
+        storage = new SharedPrefsAccessor(getApplicationContext());
     }
 
     public void login() {
@@ -100,6 +100,10 @@ public class LoginActivity extends AppCompatActivity {
         // TODO: Authentication login
 
         Log.d("LOGIN", "Checking login");
+        if (remote == null || username == null || password == null || username.isEmpty() || password.isEmpty()) {
+            onLoginFailed();
+            return;
+        }
         remote.getFriendsFor(username, new RemoteCallback<Set<UserInfo>>() {
             @Override
             public void onSuccess(Set<UserInfo> response) {

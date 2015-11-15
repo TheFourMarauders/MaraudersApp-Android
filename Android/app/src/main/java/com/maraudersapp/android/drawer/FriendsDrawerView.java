@@ -4,18 +4,14 @@ import android.content.Context;
 import android.util.Log;
 import android.view.View;
 
-import com.maraudersapp.android.R;
 import com.maraudersapp.android.datamodel.UserInfo;
 import com.maraudersapp.android.mapdrawing.PollingManager;
 import com.maraudersapp.android.remote.RemoteCallback;
 import com.maraudersapp.android.remote.ServerComm;
-import com.maraudersapp.android.remote.ServerCommManager;
-import com.maraudersapp.android.storage.SharedPrefsUserAccessor;
-import com.mikepenz.materialdrawer.Drawer;
+import com.maraudersapp.android.storage.SharedPrefsAccessor;
 import com.mikepenz.materialdrawer.model.DividerDrawerItem;
 import com.mikepenz.materialdrawer.model.PrimaryDrawerItem;
 import com.mikepenz.materialdrawer.model.SecondaryDrawerItem;
-import com.mikepenz.materialdrawer.model.ToggleDrawerItem;
 import com.mikepenz.materialdrawer.model.interfaces.IDrawerItem;
 
 import java.util.ArrayList;
@@ -29,7 +25,7 @@ public class FriendsDrawerView extends DrawerView {
 
     private List<DrawerItem> drawerItems;
 
-    public FriendsDrawerView(final ServerComm remote, final SharedPrefsUserAccessor storage,
+    public FriendsDrawerView(final ServerComm remote, final SharedPrefsAccessor storage,
                              final DrawerManager drawerManager, PollingManager pm, final Context ctx,
                              Set<UserInfo> friends, Set<UserInfo> friendRequests) {
         super(remote, storage, drawerManager, pm, ctx);
@@ -55,14 +51,14 @@ public class FriendsDrawerView extends DrawerView {
             public void handleClick(View view, IDrawerItem drawerItem) {}
         });
 
-        items.add(new DrawerItem(new SecondaryDrawerItem().withEnabled(false).withName("Friend Requests")) {
+        items.add(new DrawerItem(new SecondaryDrawerItem().withEnabled(false).withSelectable(false).withName("Friend Requests")) {
             @Override
             public void handleClick(View view, IDrawerItem drawerItem) {}
         });
 
         for (final UserInfo request : friendRequests) {
             final String username = request.getUsername();
-            items.add(new DrawerItem(new PrimaryDrawerItem().withName(request.getFirstName() + " " + request.getLastName())) {
+            items.add(new DrawerItem(new PrimaryDrawerItem().withSelectable(false).withName(request.getFirstName() + " " + request.getLastName())) {
                 @Override
                 public void handleClick(View view, final IDrawerItem drawerItem) {
                     Log.i(DRAWER_TAG, "Friend Request clicked");
@@ -82,8 +78,7 @@ public class FriendsDrawerView extends DrawerView {
                                     pollingManager.changePoller(pollingManager.newFriendPoller(username, ctx));
                                 }
                             });
-                            drawerManager.onBackPressed();
-                            drawerManager.switchView(FriendsDrawerView.this);
+                            drawerManager.updateAllItems();
                         }
 
                         @Override

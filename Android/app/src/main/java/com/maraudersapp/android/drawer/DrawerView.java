@@ -1,22 +1,12 @@
 package com.maraudersapp.android.drawer;
 
-import android.app.FragmentManager;
 import android.content.Context;
-import android.content.DialogInterface;
-import android.util.Log;
 import android.view.View;
 
-import com.cocosw.bottomsheet.BottomSheet;
-import com.maraudersapp.android.InputDialog;
-import com.maraudersapp.android.R;
 import com.maraudersapp.android.mapdrawing.PollingManager;
 import com.maraudersapp.android.remote.ServerComm;
-import com.maraudersapp.android.remote.ServerCommManager;
-import com.maraudersapp.android.storage.SharedPrefsUserAccessor;
+import com.maraudersapp.android.storage.SharedPrefsAccessor;
 import com.mikepenz.materialdrawer.Drawer;
-import com.mikepenz.materialdrawer.model.DividerDrawerItem;
-import com.mikepenz.materialdrawer.model.PrimaryDrawerItem;
-import com.mikepenz.materialdrawer.model.ToggleDrawerItem;
 import com.mikepenz.materialdrawer.model.interfaces.IDrawerItem;
 
 import java.util.ArrayList;
@@ -30,13 +20,13 @@ public abstract class DrawerView implements Drawer.OnDrawerItemClickListener {
     protected static final String DRAWER_TAG = "Drawer";
 
     // TODO passing this everywhere is dumb. maybe factory?
-    protected final SharedPrefsUserAccessor storage;
+    protected final SharedPrefsAccessor storage;
     protected final ServerComm remote;
     protected final DrawerManager drawerManager;
     protected final PollingManager pollingManager;
     protected final Context ctx;
 
-    public DrawerView(ServerComm remote, SharedPrefsUserAccessor storage, DrawerManager drawerManager,
+    public DrawerView(ServerComm remote, SharedPrefsAccessor storage, DrawerManager drawerManager,
                       PollingManager pollingManager, Context ctx) {
         this.storage = storage;
         this.remote = remote;
@@ -56,5 +46,9 @@ public abstract class DrawerView implements Drawer.OnDrawerItemClickListener {
             res.add(item.getDrawerItem());
         }
         return res;
+    }
+
+    public void cleanup() {
+
     }
 }
