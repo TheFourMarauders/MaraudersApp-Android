@@ -17,6 +17,7 @@ import com.maraudersapp.android.InputDialog;
 import com.maraudersapp.android.R;
 import com.maraudersapp.android.datamodel.LocationInfo;
 import com.maraudersapp.android.datamodel.UserInfo;
+import com.maraudersapp.android.location.HaversineCompressor;
 import com.maraudersapp.android.remote.RemoteCallback;
 import com.maraudersapp.android.util.ServerUtil;
 import com.maraudersapp.android.util.TimeUtil;
@@ -58,10 +59,11 @@ public class GroupPoller extends Poller {
                             removeAllMarkings();
                             float hue = response.size() != 1 ? 359.0f / response.size() : DEFAULT_HUE;
                             float hStep = hue;
-                            for (Map.Entry<String, List<LocationInfo>> user : response.entrySet()) {
+                            for (String user : response.keySet()) {
                                 float opacity = 1.0f / response.size();
                                 float oStep = opacity;
-                                for (LocationInfo locInfo : user.getValue()) {
+                                List<LocationInfo> userLocs = new AndroidCompressor().filter(response.get(user));
+                                for (LocationInfo locInfo : userLocs) {
                                     currentMarkers.add(gMap.addMarker(new MarkerOptions().position(
                                             new LatLng(locInfo.getLatitude(), locInfo.getLongitude()))
                                             .alpha(opacity).icon(BitmapDescriptorFactory.defaultMarker(hue))));
