@@ -46,6 +46,7 @@ public class FriendPoller extends Poller {
                             float opacity = 1.0f / response.size();
                             float step = opacity;
                             for (LocationInfo locInfo : response) {
+                                // do something smarter because this is killing the ui thread :(
                                 currentMarkers.add(gMap.addMarker(new MarkerOptions().position(
                                         new LatLng(locInfo.getLatitude(), locInfo.getLongitude()))
                                         .alpha(opacity).icon(BitmapDescriptorFactory.defaultMarker(DEFAULT_HUE))));
