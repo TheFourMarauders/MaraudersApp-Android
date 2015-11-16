@@ -94,7 +94,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
             .withSelectedItem(-1) // So no default item is selected
             .build();
 
-        drawerManager = new DrawerManager(mDrawer, mToolbar, getApplicationContext(), pollingManager);
+        drawerManager = new DrawerManager(mDrawer, mToolbar, this, pollingManager);
     }
 
     @Override

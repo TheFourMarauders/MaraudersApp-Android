@@ -49,8 +49,8 @@ public class GroupPoller extends Poller {
     @Override
     public void run() {
         remote.getGroupLocations(groupId,
-                new Date(TimeUtil.getCurrentTimeInMillis() - PollingManager.LOCATION_SPAN),
-                new Date(TimeUtil.getCurrentTimeInMillis()),
+                storage.getStartTime(),
+                storage.getEndTime(),
                 new RemoteCallback<Map<String, List<LocationInfo>>>() {
                     @Override
                     public void onSuccess(Map<String, List<LocationInfo>> response) {

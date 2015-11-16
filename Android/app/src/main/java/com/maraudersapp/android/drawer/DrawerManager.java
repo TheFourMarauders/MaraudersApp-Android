@@ -48,13 +48,6 @@ public class DrawerManager {
     }
 
     public void updateAllItems() {
-//        try {
-//            drawer.resetDrawerContent();
-//            drawer.switchDrawerContent(currentDrawerView, currentDrawerView.getAllItems(), 0);
-//        } catch (IllegalStateException e) {
-//            e.printStackTrace();
-//            Log.d("Drawer", e.toString());
-//        }
         drawer.setItems(currentDrawerView.getAllItems());
     }
 

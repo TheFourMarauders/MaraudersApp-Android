@@ -1,15 +1,19 @@
 package com.maraudersapp.android.drawer;
 
+import android.app.AlertDialog;
 import android.content.Context;
 import android.graphics.Color;
 import android.util.Log;
 import android.view.View;
 import android.widget.CompoundButton;
+import android.widget.DatePicker;
+import android.widget.TimePicker;
 
 import com.maraudersapp.android.R;
 import com.maraudersapp.android.mapdrawing.PollingManager;
 import com.maraudersapp.android.remote.ServerComm;
 import com.maraudersapp.android.storage.SharedPrefsAccessor;
+import com.maraudersapp.android.util.TimeUtil;
 import com.mikepenz.materialdrawer.interfaces.OnCheckedChangeListener;
 import com.mikepenz.materialdrawer.model.DividerDrawerItem;
 import com.mikepenz.materialdrawer.model.PrimaryDrawerItem;
@@ -18,6 +22,9 @@ import com.mikepenz.materialdrawer.model.ToggleDrawerItem;
 import com.mikepenz.materialdrawer.model.interfaces.IDrawerItem;
 
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.GregorianCalendar;
 import java.util.List;
 
 /**
@@ -30,7 +37,7 @@ public class SettingsDrawerView extends DrawerView {
     private List<DrawerItem> drawerItems;
     private boolean oldestChecked, newestChecked;
 
-    public SettingsDrawerView(ServerComm remote, SharedPrefsAccessor storage, final DrawerManager drawerManager, PollingManager pollingManager, Context ctx) {
+    public SettingsDrawerView(ServerComm remote, final SharedPrefsAccessor storage, final DrawerManager drawerManager, PollingManager pollingManager, Context ctx) {
         super(remote, storage, drawerManager, pollingManager, ctx);
         final List<DrawerItem> items = new ArrayList<>();
 
@@ -52,9 +59,13 @@ public class SettingsDrawerView extends DrawerView {
             @Override
             public void onCheckedChanged(IDrawerItem drawerItem, CompoundButton buttonView, boolean isChecked) {
                 if (oldestChecked != isChecked) {
-                    customStart.withEnabled(!isChecked);
-                    drawerManager.updateAllItems();
                     oldestChecked = isChecked;
+                    customStart.withEnabled(!isChecked);
+                    if (oldestChecked) {
+                        storage.clearStartTime();
+                    }
+                    customStart.withName("Custom: " + TimeUtil.dateToNiceString(storage.getStartTime()));
+                    drawerManager.updateAllItems();
                 }
             }
         });
@@ -66,7 +77,7 @@ public class SettingsDrawerView extends DrawerView {
             }
         });
 
-        customStart = new PrimaryDrawerItem().withEnabled(true).withName("Custom")
+        customStart = new PrimaryDrawerItem().withEnabled(true).withName("Custom: " + TimeUtil.dateToNiceString(storage.getStartTime()))
                 .withSelectable(false).withDisabledTextColor(Color.GRAY)
                 .withDisabledTextColorRes(R.color.md_light_disabled).withEnabled(!storage.isStartTimeNull());
 
@@ -74,6 +85,7 @@ public class SettingsDrawerView extends DrawerView {
             @Override
             public void handleClick(View view, IDrawerItem drawerItem) {
                 // start a fragment that has date time pickers
+                startDateTimeDialog(true);
                 Log.d(DRAWER_TAG, "Custom start time clicked");
             }
         };
@@ -99,9 +111,13 @@ public class SettingsDrawerView extends DrawerView {
             @Override
             public void onCheckedChanged(IDrawerItem drawerItem, CompoundButton buttonView, boolean isChecked) {
                 if (isChecked != newestChecked) {
-                    customEnd.withEnabled(!isChecked);
-                    drawerManager.updateAllItems();
                     newestChecked = isChecked;
+                    customEnd.withEnabled(!isChecked);
+                    if (newestChecked) {
+                        storage.clearEndTime();
+                    }
+                    customEnd.withName("Custom: " + TimeUtil.dateToNiceString(storage.getEndTime()));
+                    drawerManager.updateAllItems();
                 }
             }
         });
@@ -113,7 +129,7 @@ public class SettingsDrawerView extends DrawerView {
             }
         });
 
-        customEnd = new PrimaryDrawerItem().withEnabled(true).withName("Custom")
+        customEnd = new PrimaryDrawerItem().withEnabled(true).withName("Custom: " + TimeUtil.dateToNiceString(storage.getEndTime()))
                 .withSelectable(false).withDisabledTextColor(Color.GRAY)
                 .withDisabledTextColorRes(R.color.md_light_disabled).withEnabled(!storage.isEndTimeNull());
 
@@ -121,6 +137,7 @@ public class SettingsDrawerView extends DrawerView {
             @Override
             public void handleClick(View view, IDrawerItem drawerItem) {
                 // start fragment with date time pickers for end
+                startDateTimeDialog(false);
                 Log.d(DRAWER_TAG, "Custom end time clicked");
             }
         };
@@ -128,6 +145,38 @@ public class SettingsDrawerView extends DrawerView {
 
         drawerItems = items;
 
+    }
+
+    private void startDateTimeDialog(final boolean isStart) {
+        final View dialogView = View.inflate(ctx, R.layout.date_time_dialog, null);
+        final AlertDialog alertDialog = new AlertDialog.Builder(ctx).create();
+
+        dialogView.findViewById(R.id.date_time_set).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                DatePicker datePicker = (DatePicker) dialogView.findViewById(R.id.date_picker);
+                TimePicker timePicker = (TimePicker) dialogView.findViewById(R.id.time_picker);
+
+                Calendar calendar = new GregorianCalendar(datePicker.getYear(),
+                        datePicker.getMonth(),
+                        datePicker.getDayOfMonth(),
+                        timePicker.getCurrentHour(),
+                        timePicker.getCurrentMinute());
+
+                Date selectedTime = calendar.getTime();
+                if (isStart) {
+                    storage.putStartTime(selectedTime);
+                } else {
+                    storage.putEndTime(selectedTime);
+                }
+                customStart.withName("Custom: " + TimeUtil.dateToNiceString(storage.getStartTime()));
+                customEnd.withName("Custom: " + TimeUtil.dateToNiceString(storage.getEndTime()));
+                drawerManager.updateAllItems();
+                alertDialog.dismiss();
+            }
+        });
+        alertDialog.setView(dialogView);
+        alertDialog.show();
     }
 
     @Override

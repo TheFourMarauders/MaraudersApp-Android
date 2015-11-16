@@ -34,8 +34,8 @@ public class FriendPoller extends Poller {
     @Override
     public void run() {
         remote.getLocationsFor(username,
-                new Date(TimeUtil.getCurrentTimeInMillis() - PollingManager.LOCATION_SPAN),
-                new Date(TimeUtil.getCurrentTimeInMillis()),
+                storage.getStartTime(),
+                storage.getEndTime(),
                 new RemoteCallback<List<LocationInfo>>() {
                     @Override
                     public void onSuccess(List<LocationInfo> response) {
