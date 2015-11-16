@@ -11,7 +11,7 @@ import java.util.List;
 public class HaversineCompressor implements LocationCompressor {
     private static final double EARTH_RAD = 6.371e6;
     private static final double MIN_DIFF = 50;
-
+    float[] results = new float[1];
     @Override
     public List<LocationInfo> filter(List<LocationInfo> allLocations) {
         List<LocationInfo> filtered = new ArrayList<>();
@@ -32,16 +32,9 @@ public class HaversineCompressor implements LocationCompressor {
         double lat2 = l2.getLatitude();
         double long1 = l1.getLongitude();
         double long2 = l2.getLongitude();
-
-        double dLat = Math.toRadians(lat2 - lat1);
-        double dLong = Math.toRadians(long2 - long1);
-
-        double a = Math.sin(dLat / 2) * Math.sin(dLat / 2)
-                + Math.cos(Math.toRadians(lat1)) * Math.cos(Math.toRadians(lat2))
-                + Math.sin(dLong / 2) * Math.sin(dLong / 2);
-
-        double c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-        double d = EARTH_RAD * c; // Distance in m
-        return Math.abs(d);
+        float[] result = new float[1];
+        android.location.Location.distanceBetween
+                (lat1,long1,lat2, long2, result);
+        return result[0];
     }
 }
