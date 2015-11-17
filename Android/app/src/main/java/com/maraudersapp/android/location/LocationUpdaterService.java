@@ -7,7 +7,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.location.Criteria;
 import android.location.Location;
-import android.location.LocationListener;
+import com.google.android.gms.location.LocationListener;
 import android.location.LocationManager;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
@@ -17,6 +17,10 @@ import android.os.PowerManager;
 import android.os.SystemClock;
 import android.util.Log;
 
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.location.LocationRequest;
+import com.google.android.gms.location.LocationServices;
 import com.maraudersapp.android.datamodel.LocationInfo;
 import com.maraudersapp.android.remote.RemoteCallback;
 import com.maraudersapp.android.remote.ServerComm;
@@ -27,7 +31,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 
-public  final class LocationUpdaterService extends Service implements LocationListener {
+public  final class LocationUpdaterService extends Service
+        implements LocationListener, GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
 
     private enum State {
         IDLE, WORKING;
@@ -37,6 +42,8 @@ public  final class LocationUpdaterService extends Service implements LocationLi
 
     private LocationManager locationManager;
     private PowerManager.WakeLock wakeLock;
+    private GoogleApiClient mGoogleApiClient;
+    private LocationRequest mLocationRequest;
 
     private boolean gpsActive;
     private boolean networkActive;
@@ -116,40 +123,12 @@ public  final class LocationUpdaterService extends Service implements LocationLi
     }
 
     @Override
-    public int onStartCommand(Intent intent, int flags, int startId) {
-        if (state == State.IDLE) {
-            state = State.WORKING;
-            this.wakeLock.acquire();
-            Log.i(LocationConstants.LOG_TAG, "Location onStartCommand. Starting location.");
-
-            // Acquire a reference to the system Location Manager
-            locationManager = (LocationManager) this.getSystemService(Context.LOCATION_SERVICE);
-
-
-            if (locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER)) {
-                Log.i(LocationConstants.LOG_TAG, "Network active");
-                networkActive = true;
-                locationManager.requestSingleUpdate(LocationManager.NETWORK_PROVIDER, this, null);
-            }
-
-            if (locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
-                Log.i(LocationConstants.LOG_TAG, "GPS active");
-                gpsActive = true;
-                locationManager.requestSingleUpdate(LocationManager.GPS_PROVIDER, this, null);
-            }
-
-            if (!networkActive && !gpsActive) {
-                Log.i(LocationConstants.LOG_TAG, "Neither active");
-                onSendingFinished();
-            }
-        }
-        return START_STICKY;
-    }
-
-    @Override
     public void onDestroy() {
         super.onDestroy();
         state = State.IDLE;
+        if(mGoogleApiClient.isConnected()) {
+            mGoogleApiClient.disconnect();
+        }
         if (this.wakeLock.isHeld()) {
             this.wakeLock.release();
         }
@@ -187,36 +166,6 @@ public  final class LocationUpdaterService extends Service implements LocationLi
         //or you will end up draining battery like hell
     }
 
-    @Override
-    public void onLocationChanged(Location location) {
-        Log.i(LocationConstants.LOG_TAG, "onLocationChanged " + location.getProvider().toString());
-        if (networkLocation != null && gpsLocation != null) {
-            Log.i(LocationConstants.LOG_TAG, "Received all locations");
-            locationManager.removeUpdates(this); // you will want to listen for updates only once
-            networkLocation = null;
-            gpsLocation = null;
-            gpsActive = false;
-            networkActive = false;
-            sendToServer(getBestLocation(gpsLocation, networkLocation));
-        } else if (location.getProvider().equals(LocationManager.NETWORK_PROVIDER)) {
-            networkLocation = location;
-            if (!gpsActive) {
-                locationManager.removeUpdates(this); // you will want to listen for updates only once
-                networkActive = false;
-                networkLocation = null;
-                sendToServer(location);
-            }
-        } else if (location.getProvider().equals(LocationManager.GPS_PROVIDER)) {
-            gpsLocation = location;
-            if (!networkActive) {
-                locationManager.removeUpdates(this); // you will want to listen for updates only once
-                gpsActive = false;
-                gpsLocation = null;
-                sendToServer(location);
-            }
-        }
-    }
-
     private Location getBestLocation(Location location1, Location location2) {
         long timeDelta = location1.getTime() - location2.getTime();
         boolean isSignificantlyNewer = timeDelta > 1000*60*2;
@@ -247,15 +196,44 @@ public  final class LocationUpdaterService extends Service implements LocationLi
     }
 
     @Override
-    public void onProviderDisabled(String provider) {
+    public int onStartCommand(Intent intent, int flags, int startId) {
+
+        mLocationRequest = LocationRequest.create();
+        mLocationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
+        mGoogleApiClient = new GoogleApiClient.Builder(this).addApi(LocationServices.API)
+                .addConnectionCallbacks(this).addOnConnectionFailedListener(this).build();
+        mGoogleApiClient.connect();
+
+        if (state == State.IDLE) {
+            state = State.WORKING;
+            this.wakeLock.acquire();
+            Log.i(LocationConstants.LOG_TAG, "Location onStartCommand. Starting location.");
+        }
+
+        return START_STICKY;
+    }
+
+
+
+    @Override
+    public void onConnected(Bundle bundle) {
+        LocationServices.FusedLocationApi.requestLocationUpdates(mGoogleApiClient, mLocationRequest, this);
     }
 
     @Override
-    public void onProviderEnabled(String provider) {
+    public void onConnectionSuspended(int i) {
+
     }
 
     @Override
-    public void onStatusChanged(String provider, int status, Bundle extras) {
+    public void onLocationChanged(Location location) {
+        Log.i(LocationConstants.LOG_TAG, "onLocationChanged " + location.getProvider().toString());
+        sendToServer(location);
     }
 
+    @Override
+    public void onConnectionFailed(ConnectionResult connectionResult) {
+
+    }
 }
+
