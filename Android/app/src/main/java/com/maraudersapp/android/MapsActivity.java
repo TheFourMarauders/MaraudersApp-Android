@@ -71,6 +71,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
             stateFragment = new StateFragment();
             fm.beginTransaction().add(stateFragment, STATE_TAG).commit();
             stateFragment.setData(initializeState());
+            storage.setIncognito(false);
         }
 
         loadInstanceState(stateFragment);
@@ -80,7 +81,9 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
 
-        LocationUpdaterService.scheduleLocationPolling(getApplicationContext());
+        if (!storage.isIncognito()) {
+            LocationUpdaterService.scheduleLocationPolling(getApplicationContext());
+        }
     }
 
     private InstanceData initializeState() {

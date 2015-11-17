@@ -21,12 +21,21 @@ public class SharedPrefsAccessor {
         this.prefsEditor = prefs.edit();
     }
 
+    public boolean isIncognito() {
+        return prefs.getBoolean("incognito", false);
+    }
+
     public String getUsername() {
         return prefs.getString("username", null);
     }
 
     public String getPassword() {
         return prefs.getString("password", null);
+    }
+
+    public void setIncognito(boolean isIncognito) {
+        prefsEditor.putBoolean("incognito", isIncognito);
+        prefsEditor.commit();
     }
 
     public void putCredentials(String username, String password) {

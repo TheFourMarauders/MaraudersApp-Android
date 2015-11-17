@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.util.Log;
 import android.view.View;
+import android.widget.CompoundButton;
 
 import com.maraudersapp.android.LoginActivity;
 import com.maraudersapp.android.R;
@@ -15,6 +16,7 @@ import com.maraudersapp.android.mapdrawing.PollingManager;
 import com.maraudersapp.android.remote.RemoteCallback;
 import com.maraudersapp.android.remote.ServerComm;
 import com.maraudersapp.android.storage.SharedPrefsAccessor;
+import com.mikepenz.materialdrawer.interfaces.OnCheckedChangeListener;
 import com.mikepenz.materialdrawer.model.DividerDrawerItem;
 import com.mikepenz.materialdrawer.model.PrimaryDrawerItem;
 import com.mikepenz.materialdrawer.model.ToggleDrawerItem;
@@ -119,12 +121,23 @@ public class MainDrawerView extends DrawerView {
 
             // Incognito
             new DrawerItem(new ToggleDrawerItem().withName(R.string.incognito_item_name)
-                    .withIdentifier(4).withSelectable(false)) {
+                    .withIdentifier(4).withSelectable(false).withChecked(storage.isIncognito())
+                    .withOnCheckedChangeListener(new OnCheckedChangeListener() {
+                        @Override
+                        public void onCheckedChanged(IDrawerItem iDrawerItem, CompoundButton compoundButton, boolean b) {
+                            if (storage.isIncognito()) {
+                                Log.i(DRAWER_TAG, "Stopping Incognito");
+                                LocationUpdaterService.scheduleLocationPolling(ctx);
+                            } else {
+                                Log.i(DRAWER_TAG, "Incognito started");
+                                LocationUpdaterService.stopLocationPolling(ctx);
+                            }
+                            storage.setIncognito(!storage.isIncognito());
+                        }
+                    })) {
 
                 @Override
-                public void handleClick(View view, IDrawerItem drawerItem) {
-                    Log.i(DRAWER_TAG, "Incognito clicked");
-                }
+                public void handleClick(View view, IDrawerItem drawerItem) {}
 
             },
 
