@@ -109,10 +109,6 @@ public  final class LocationUpdaterService extends Service
 
         storage = new SharedPrefsAccessor(getApplicationContext());
 
-        if(!storage.isCredentialsNull()) {
-            // TODO is this possible / what does this mean?
-        }
-
         remote = ServerCommManager.getCommForContext(getApplicationContext());
     }
 
@@ -166,35 +162,6 @@ public  final class LocationUpdaterService extends Service
         //or you will end up draining battery like hell
     }
 
-    private Location getBestLocation(Location location1, Location location2) {
-        long timeDelta = location1.getTime() - location2.getTime();
-        boolean isSignificantlyNewer = timeDelta > 1000*60*2;
-        boolean isSignificantlyOlder = timeDelta < -1000*60*2;
-        boolean isNewer = timeDelta > 0;
-
-        if (isSignificantlyNewer) {
-            return location1;
-        } else if (isSignificantlyOlder) {
-            return location2;
-        }
-
-        // Check whether the new location fix is more or less accurate
-        int accuracyDelta = (int) (location1.getAccuracy() - location2.getAccuracy());
-        boolean isLessAccurate = accuracyDelta > 0;
-        boolean isMoreAccurate = accuracyDelta < 0;
-        boolean isSignificantlyLessAccurate = accuracyDelta > 200;
-
-        // Determine location quality using a combination of timeliness and accuracy
-        if (isMoreAccurate) {
-            return location1;
-        } else if (isNewer && !isLessAccurate) {
-            return location1;
-        } else if (isNewer && !isSignificantlyLessAccurate) {
-            return location1;
-        }
-        return location2;
-    }
-
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
 
@@ -228,6 +195,7 @@ public  final class LocationUpdaterService extends Service
     @Override
     public void onLocationChanged(Location location) {
         Log.i(LocationConstants.LOG_TAG, "onLocationChanged " + location.getProvider().toString());
+        LocationServices.FusedLocationApi.removeLocationUpdates(mGoogleApiClient, this);
         sendToServer(location);
     }
 
