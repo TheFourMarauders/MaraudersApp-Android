@@ -10,7 +10,6 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.maraudersapp.android.datamodel.LocationInfo;
-import com.maraudersapp.android.location.AndroidCompressor;
 import com.maraudersapp.android.location.HaversineCompressor;
 import com.maraudersapp.android.remote.RemoteCallback;
 import com.maraudersapp.android.util.TimeUtil;
