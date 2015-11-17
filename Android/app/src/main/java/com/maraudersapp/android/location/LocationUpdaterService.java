@@ -5,6 +5,7 @@ import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
+import android.location.Criteria;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
@@ -36,6 +37,11 @@ public  final class LocationUpdaterService extends Service implements LocationLi
 
     private LocationManager locationManager;
     private PowerManager.WakeLock wakeLock;
+
+    private boolean gpsActive;
+    private boolean networkActive;
+    private Location gpsLocation;
+    private Location networkLocation;
 
     private ServerComm remote;
     private SharedPrefsAccessor storage;
@@ -119,10 +125,23 @@ public  final class LocationUpdaterService extends Service implements LocationLi
             // Acquire a reference to the system Location Manager
             locationManager = (LocationManager) this.getSystemService(Context.LOCATION_SERVICE);
 
-            // TODO try with GPS
-            // Register the listener with the Location Manager to receive location updates
-            locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 0, 0, this);
 
+            if (locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER)) {
+                Log.i(LocationConstants.LOG_TAG, "Network active");
+                networkActive = true;
+                locationManager.requestSingleUpdate(LocationManager.NETWORK_PROVIDER, this, null);
+            }
+
+            if (locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
+                Log.i(LocationConstants.LOG_TAG, "GPS active");
+                gpsActive = true;
+                locationManager.requestSingleUpdate(LocationManager.GPS_PROVIDER, this, null);
+            }
+
+            if (!networkActive && !gpsActive) {
+                Log.i(LocationConstants.LOG_TAG, "Neither active");
+                onSendingFinished();
+            }
         }
         return START_STICKY;
     }
@@ -170,9 +189,61 @@ public  final class LocationUpdaterService extends Service implements LocationLi
 
     @Override
     public void onLocationChanged(Location location) {
-        Log.i(LocationConstants.LOG_TAG, "Received location");
-        locationManager.removeUpdates(this); // you will want to listen for updates only once
-        sendToServer(location);
+        Log.i(LocationConstants.LOG_TAG, "onLocationChanged " + location.getProvider().toString());
+        if (networkLocation != null && gpsLocation != null) {
+            Log.i(LocationConstants.LOG_TAG, "Received all locations");
+            locationManager.removeUpdates(this); // you will want to listen for updates only once
+            networkLocation = null;
+            gpsLocation = null;
+            gpsActive = false;
+            networkActive = false;
+            sendToServer(getBestLocation(gpsLocation, networkLocation));
+        } else if (location.getProvider().equals(LocationManager.NETWORK_PROVIDER)) {
+            networkLocation = location;
+            if (!gpsActive) {
+                locationManager.removeUpdates(this); // you will want to listen for updates only once
+                networkActive = false;
+                networkLocation = null;
+                sendToServer(location);
+            }
+        } else if (location.getProvider().equals(LocationManager.GPS_PROVIDER)) {
+            gpsLocation = location;
+            if (!networkActive) {
+                locationManager.removeUpdates(this); // you will want to listen for updates only once
+                gpsActive = false;
+                gpsLocation = null;
+                sendToServer(location);
+            }
+        }
+    }
+
+    private Location getBestLocation(Location location1, Location location2) {
+        long timeDelta = location1.getTime() - location2.getTime();
+        boolean isSignificantlyNewer = timeDelta > 1000*60*2;
+        boolean isSignificantlyOlder = timeDelta < -1000*60*2;
+        boolean isNewer = timeDelta > 0;
+
+        if (isSignificantlyNewer) {
+            return location1;
+        } else if (isSignificantlyOlder) {
+            return location2;
+        }
+
+        // Check whether the new location fix is more or less accurate
+        int accuracyDelta = (int) (location1.getAccuracy() - location2.getAccuracy());
+        boolean isLessAccurate = accuracyDelta > 0;
+        boolean isMoreAccurate = accuracyDelta < 0;
+        boolean isSignificantlyLessAccurate = accuracyDelta > 200;
+
+        // Determine location quality using a combination of timeliness and accuracy
+        if (isMoreAccurate) {
+            return location1;
+        } else if (isNewer && !isLessAccurate) {
+            return location1;
+        } else if (isNewer && !isSignificantlyLessAccurate) {
+            return location1;
+        }
+        return location2;
     }
 
     @Override

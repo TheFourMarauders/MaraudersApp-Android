@@ -10,6 +10,7 @@ import java.util.List;
 public class AndroidCompressor implements LocationCompressor {
     @Override
     public List<LocationInfo> filter(List<LocationInfo> allLocations) {
-        return allLocations;
+        if (allLocations.size() < 15) return allLocations;
+        return allLocations.subList(allLocations.size() - 10, allLocations.size());
     }
 }
