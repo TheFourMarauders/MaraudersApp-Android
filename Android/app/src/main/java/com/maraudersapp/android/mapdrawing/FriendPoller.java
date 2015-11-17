@@ -45,9 +45,9 @@ public class FriendPoller extends Poller {
                                 + ". Size: " + response.size());
                         if (!response.isEmpty()) {
                             removeAllMarkings();
+                            response = new HaversineCompressor().filter(response);
                             float opacity = 1.0f / response.size();
                             float step = opacity;
-                            response = new AndroidCompressor().filter(response);
                             for (LocationInfo locInfo : response) {
                                 // do something smarter because this is killing the ui thread :(
                                 currentMarkers.add(gMap.addMarker(new MarkerOptions().position(

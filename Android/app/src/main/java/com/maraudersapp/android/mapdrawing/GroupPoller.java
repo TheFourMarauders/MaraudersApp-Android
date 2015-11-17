@@ -61,9 +61,9 @@ public class GroupPoller extends Poller {
                             float hue = response.size() != 1 ? 359.0f / response.size() : DEFAULT_HUE;
                             float hStep = hue;
                             for (String user : response.keySet()) {
-                                float opacity = 1.0f / response.size();
+                                List<LocationInfo> userLocs = new HaversineCompressor().filter(response.get(user));
+                                float opacity = 1.0f / userLocs.size();
                                 float oStep = opacity;
-                                List<LocationInfo> userLocs = new AndroidCompressor().filter(response.get(user));
                                 for (LocationInfo locInfo : userLocs) {
                                     currentMarkers.add(gMap.addMarker(new MarkerOptions().position(
                                             new LatLng(locInfo.getLatitude(), locInfo.getLongitude()))

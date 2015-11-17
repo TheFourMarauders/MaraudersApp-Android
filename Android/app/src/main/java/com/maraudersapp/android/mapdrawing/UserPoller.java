@@ -45,9 +45,9 @@ public class UserPoller extends Poller {
                                 + ". Size: " + response.size());
                         if (!response.isEmpty()) {
                             removeAllMarkings();
+                            response = new HaversineCompressor().filter(response);
                             float opacity = 1.0f / response.size();
                             float step = opacity;
-                            response = new AndroidCompressor().filter(response);
                             for (LocationInfo locInfo : response) {
                                 currentMarkers.add(gMap.addMarker(new MarkerOptions().position(
                                         new LatLng(locInfo.getLatitude(), locInfo.getLongitude()))
