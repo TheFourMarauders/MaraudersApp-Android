@@ -37,12 +37,21 @@ public final class TimeUtil {
     }
 
     public synchronized static String dateToString(Date d) {
+        if (d == null) {
+            return null;
+        }
         TimeZone tz = TimeZone.getTimeZone("UTC");
         DateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
         df.setTimeZone(tz);
         return df.format(d);
     }
 
-
+    public synchronized static String dateToNiceString(Date d) {
+        if (d == null) {
+            return "";
+        }
+        DateFormat df = new SimpleDateFormat("EEE, d MMM yyyy HH:mm");
+        return df.format(d);
+    }
 
 }

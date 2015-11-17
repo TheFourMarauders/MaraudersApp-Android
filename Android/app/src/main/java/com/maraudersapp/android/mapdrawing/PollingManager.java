@@ -36,9 +36,16 @@ public class PollingManager {
     }
 
     public void setGoogleMap(GoogleMap map, Context ctx) {
-        googleMap = map;
-        currentPoller = newUserPoller(ctx);
-        pollHandler.postDelayed(currentPoller, 0);
+        if (googleMap == null) {
+            googleMap = map;
+            currentPoller = newUserPoller(ctx);
+            pollHandler.postDelayed(currentPoller, 0);
+        } else {
+            googleMap = map;
+            stopPolling();
+            currentPoller.changeMap(googleMap);
+            continuePolling();
+        }
     }
 
     public void changePoller(Poller poller) {
@@ -53,7 +60,9 @@ public class PollingManager {
     }
 
     public void continuePolling() {
-        pollHandler.postDelayed(currentPoller, 0);
+        if (currentPoller != null) {
+            pollHandler.postDelayed(currentPoller, 0);
+        }
     }
 
     public void onPlusPressed(Activity ctx) {

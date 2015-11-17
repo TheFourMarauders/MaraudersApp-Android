@@ -8,7 +8,6 @@ import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
-import android.view.View;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -19,27 +18,18 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
-import com.maraudersapp.android.drawer.DrawerItem;
 import com.maraudersapp.android.drawer.DrawerManager;
-import com.maraudersapp.android.drawer.DrawerView;
 import com.maraudersapp.android.StateFragment.InstanceData;
 import com.maraudersapp.android.location.LocationUpdaterService;
 import com.maraudersapp.android.mapdrawing.PollingManager;
-import com.maraudersapp.android.remote.RemoteCallback;
 import com.maraudersapp.android.remote.ServerComm;
 import com.maraudersapp.android.remote.ServerCommManager;
-import com.maraudersapp.android.storage.SharedPrefsUserAccessor;
+import com.maraudersapp.android.storage.SharedPrefsAccessor;
 import com.mikepenz.materialdrawer.AccountHeader;
 import com.mikepenz.materialdrawer.AccountHeaderBuilder;
 import com.mikepenz.materialdrawer.Drawer;
 import com.mikepenz.materialdrawer.DrawerBuilder;
-import com.mikepenz.materialdrawer.model.DividerDrawerItem;
-import com.mikepenz.materialdrawer.model.PrimaryDrawerItem;
 import com.mikepenz.materialdrawer.model.ProfileDrawerItem;
-import com.mikepenz.materialdrawer.model.ToggleDrawerItem;
-import com.mikepenz.materialdrawer.model.interfaces.IDrawerItem;
-
-import java.util.ArrayList;
 
 /**
  * Main activity that displays the map that the users can interact with.
@@ -59,7 +49,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     private Toolbar mToolbar;
     private Drawer mDrawer;
     private ServerComm remote;
-    private SharedPrefsUserAccessor storage;
+    private SharedPrefsAccessor storage;
     private DrawerManager drawerManager;
     private PollingManager pollingManager;
 
@@ -69,13 +59,14 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         setContentView(R.layout.activity_maps);
 
         remote = ServerCommManager.getCommForContext(getApplicationContext());
-        storage = new SharedPrefsUserAccessor(getApplicationContext());
+        storage = new SharedPrefsAccessor(getApplicationContext());
 
         FragmentManager fm = getFragmentManager();
         stateFragment = (StateFragment) fm.findFragmentByTag(STATE_TAG);
 
         // create the fragment and data the first time
         if (stateFragment == null) {
+            Log.i(MAPS_ACTIVITY_TAG, "Found no previous state");
             // add the fragment
             stateFragment = new StateFragment();
             fm.beginTransaction().add(stateFragment, STATE_TAG).commit();
@@ -130,7 +121,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
             .withSelectedItem(-1) // So no default item is selected
             .build();
 
-        drawerManager = new DrawerManager(mDrawer, mToolbar, getApplicationContext(), pollingManager);
+        drawerManager = new DrawerManager(mDrawer, mToolbar, this, pollingManager);
     }
 
     @Override
@@ -206,6 +197,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
 
     @Override
     public void onDestroy() {
+        Log.i(MAPS_ACTIVITY_TAG, "Destroyed");
         super.onDestroy();
         stateFragment.setData(new InstanceData(mToolbar.getTitle().toString(), pollingManager));
     }

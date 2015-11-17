@@ -5,17 +5,15 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.os.Handler;
 import android.util.Log;
-import android.widget.Toast;
 
 import com.cocosw.bottomsheet.BottomSheet;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.maraudersapp.android.InputDialog;
 import com.maraudersapp.android.R;
-import com.maraudersapp.android.remote.RemoteCallback;
 import com.maraudersapp.android.remote.ServerComm;
 import com.maraudersapp.android.remote.ServerCommManager;
-import com.maraudersapp.android.storage.SharedPrefsUserAccessor;
+import com.maraudersapp.android.storage.SharedPrefsAccessor;
 import com.maraudersapp.android.util.ServerUtil;
 
 /**
@@ -28,17 +26,21 @@ public abstract class Poller implements Runnable {
     protected Handler handler;
     protected GoogleMap gMap;
 
-    protected final SharedPrefsUserAccessor storage;
+    protected final SharedPrefsAccessor storage;
     protected final ServerComm remote;
 
     Poller(Handler handler, GoogleMap googleMap, Context ctx) {
         this.handler = handler;
         gMap = googleMap;
-        storage = new SharedPrefsUserAccessor(ctx);
+        storage = new SharedPrefsAccessor(ctx);
         remote = ServerCommManager.getCommForContext(ctx);
     }
 
     abstract void removeAllMarkings();
+
+    void changeMap(GoogleMap map) {
+        gMap = map;
+    }
 
     /**
      * Assuming a poller represents a screen, what should happen when plus is pressed on that screen

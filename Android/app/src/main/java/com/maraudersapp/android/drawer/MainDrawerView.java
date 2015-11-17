@@ -1,5 +1,6 @@
 package com.maraudersapp.android.drawer;
 
+
 import android.content.Context;
 import android.content.Intent;
 import android.util.Log;
@@ -13,7 +14,7 @@ import com.maraudersapp.android.location.LocationUpdaterService;
 import com.maraudersapp.android.mapdrawing.PollingManager;
 import com.maraudersapp.android.remote.RemoteCallback;
 import com.maraudersapp.android.remote.ServerComm;
-import com.maraudersapp.android.storage.SharedPrefsUserAccessor;
+import com.maraudersapp.android.storage.SharedPrefsAccessor;
 import com.mikepenz.materialdrawer.model.DividerDrawerItem;
 import com.mikepenz.materialdrawer.model.PrimaryDrawerItem;
 import com.mikepenz.materialdrawer.model.ToggleDrawerItem;
@@ -51,22 +52,33 @@ public class MainDrawerView extends DrawerView {
                 public void handleClick(View view, IDrawerItem drawerItem) {
                     Log.i(DRAWER_TAG, "Friends clicked");
                     remote.getFriendsFor(
-                            storage.getUsername(),
-                            new RemoteCallback<Set<UserInfo>>() {
-                                @Override
-                                public void onSuccess(Set<UserInfo> response) {
-                                    Log.i(DRAWER_TAG, "Friend response received");
-                                    DrawerView newView = new FriendsDrawerView(remote, storage,
-                                            drawerManager, pollingManager, ctx, response);
-                                    Log.i(DRAWER_TAG, response.toString());
-                                    drawerManager.switchView(newView);
-                                }
+                        storage.getUsername(),
+                        new RemoteCallback<Set<UserInfo>>() {
+                            @Override
+                            public void onSuccess(Set<UserInfo> response) {
+                                final Set<UserInfo> friends = response;
+                                remote.getFriendRequestsFor(storage.getUsername(), new RemoteCallback<Set<UserInfo>>() {
+                                    @Override
+                                    public void onSuccess(Set<UserInfo> response) {
+                                        final DrawerView newView = new FriendsDrawerView(remote, storage,
+                                                drawerManager, pollingManager, ctx, friends, response);
 
-                                @Override
-                                public void onFailure(int errorCode, String message) {
-                                    // TODO error view
-                                }
+                                        Log.i(DRAWER_TAG, "Friend response received");
+                                        Log.i(DRAWER_TAG, response.toString());
+                                        drawerManager.switchView(newView);
+                                    }
+                                    @Override
+                                    public void onFailure(int errorCode, String message) {
+                                        // TODO
+                                    }
+                                });
                             }
+
+                            @Override
+                            public void onFailure(int errorCode, String message) {
+                                // TODO error view
+                            }
+                        }
                     );
                 }
 
@@ -123,6 +135,9 @@ public class MainDrawerView extends DrawerView {
                 @Override
                 public void handleClick(View view, IDrawerItem drawerItem) {
                     Log.i(DRAWER_TAG, "Settings clicked");
+                    DrawerView newView = new SettingsDrawerView(remote, storage,
+                            drawerManager, pollingManager, ctx);
+                    drawerManager.switchView(newView);
                 }
 
             },
@@ -140,7 +155,7 @@ public class MainDrawerView extends DrawerView {
             },
     };
 
-    public MainDrawerView(ServerComm remote, SharedPrefsUserAccessor storage, DrawerManager drawerManager,
+    public MainDrawerView(ServerComm remote, SharedPrefsAccessor storage, DrawerManager drawerManager,
                           PollingManager pollingManager, Context ctx) {
         super(remote, storage, drawerManager, pollingManager, ctx);
     }

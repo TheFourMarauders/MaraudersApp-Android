@@ -13,7 +13,7 @@ import com.maraudersapp.android.datamodel.UserCreationInfo;
 import com.maraudersapp.android.remote.RemoteCallback;
 import com.maraudersapp.android.remote.ServerComm;
 import com.maraudersapp.android.remote.ServerCommManager;
-import com.maraudersapp.android.storage.SharedPrefsUserAccessor;
+import com.maraudersapp.android.storage.SharedPrefsAccessor;
 
 import butterknife.ButterKnife;
 import butterknife.InjectView;
@@ -30,7 +30,7 @@ public class SignUpActivity extends AppCompatActivity{
     @InjectView(R.id.signup_button) Button signUpButton;
     @InjectView(R.id.link_login) TextView login;
 
-    private SharedPrefsUserAccessor storage;
+    private SharedPrefsAccessor storage;
     private ServerComm remote;
 
     @Override
@@ -39,7 +39,7 @@ public class SignUpActivity extends AppCompatActivity{
         setContentView(R.layout.activity_signup);
         ButterKnife.inject(this);
 
-        storage = new SharedPrefsUserAccessor(getApplicationContext());
+        storage = new SharedPrefsAccessor(getApplicationContext());
         remote = ServerCommManager.getCommForContext(getApplicationContext());
 
         signUpButton.setOnClickListener(new View.OnClickListener() {
@@ -61,7 +61,7 @@ public class SignUpActivity extends AppCompatActivity{
     public void onResume() {
         super.onResume();
         remote = ServerCommManager.getCommForContext(getApplicationContext());
-        storage = new SharedPrefsUserAccessor(getApplicationContext());
+        storage = new SharedPrefsAccessor(getApplicationContext());
     }
 
     public void signup() {

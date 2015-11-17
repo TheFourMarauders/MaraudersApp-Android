@@ -10,6 +10,8 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.maraudersapp.android.datamodel.LocationInfo;
+import com.maraudersapp.android.location.AndroidCompressor;
+import com.maraudersapp.android.location.HaversineCompressor;
 import com.maraudersapp.android.remote.RemoteCallback;
 import com.maraudersapp.android.util.TimeUtil;
 
@@ -34,8 +36,8 @@ public class FriendPoller extends Poller {
     @Override
     public void run() {
         remote.getLocationsFor(username,
-                new Date(TimeUtil.getCurrentTimeInMillis() - PollingManager.LOCATION_SPAN),
-                new Date(TimeUtil.getCurrentTimeInMillis()),
+                storage.getStartTime(),
+                storage.getEndTime(),
                 new RemoteCallback<List<LocationInfo>>() {
                     @Override
                     public void onSuccess(List<LocationInfo> response) {
@@ -45,7 +47,9 @@ public class FriendPoller extends Poller {
                             removeAllMarkings();
                             float opacity = 1.0f / response.size();
                             float step = opacity;
+                            response = new AndroidCompressor().filter(response);
                             for (LocationInfo locInfo : response) {
+                                // do something smarter because this is killing the ui thread :(
                                 currentMarkers.add(gMap.addMarker(new MarkerOptions().position(
                                         new LatLng(locInfo.getLatitude(), locInfo.getLongitude()))
                                         .alpha(opacity).icon(BitmapDescriptorFactory.defaultMarker(DEFAULT_HUE))));

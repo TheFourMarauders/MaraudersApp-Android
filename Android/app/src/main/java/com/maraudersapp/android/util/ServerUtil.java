@@ -6,7 +6,6 @@ import android.widget.Toast;
 
 import com.maraudersapp.android.remote.RemoteCallback;
 import com.maraudersapp.android.remote.ServerComm;
-import com.maraudersapp.android.storage.SharedPrefsUserAccessor;
 
 /**
  * Created by Michael on 11/3/2015.

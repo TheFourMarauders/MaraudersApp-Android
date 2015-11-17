@@ -15,17 +15,14 @@ import android.os.IBinder;
 import android.os.PowerManager;
 import android.os.SystemClock;
 import android.util.Log;
-import android.view.View;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.maraudersapp.android.datamodel.LocationInfo;
 import com.maraudersapp.android.remote.RemoteCallback;
 import com.maraudersapp.android.remote.ServerComm;
 import com.maraudersapp.android.remote.ServerCommManager;
-import com.maraudersapp.android.storage.SharedPrefsUserAccessor;
+import com.maraudersapp.android.storage.SharedPrefsAccessor;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 
@@ -41,7 +38,7 @@ public  final class LocationUpdaterService extends Service implements LocationLi
     private PowerManager.WakeLock wakeLock;
 
     private ServerComm remote;
-    private SharedPrefsUserAccessor storage;
+    private SharedPrefsAccessor storage;
 
     static {
         state = State.IDLE;
@@ -97,7 +94,7 @@ public  final class LocationUpdaterService extends Service implements LocationLi
         final PowerManager pm = (PowerManager) getSystemService(Context.POWER_SERVICE);
         this.wakeLock = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "LocationUpdaterService");
 
-        storage = new SharedPrefsUserAccessor(getApplicationContext());
+        storage = new SharedPrefsAccessor(getApplicationContext());
 
         if(!storage.isCredentialsNull()) {
             // TODO is this possible / what does this mean?

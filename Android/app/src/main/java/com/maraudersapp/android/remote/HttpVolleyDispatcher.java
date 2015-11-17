@@ -1,8 +1,6 @@
 package com.maraudersapp.android.remote;
 
 import android.content.Context;
-import android.content.SharedPreferences;
-import android.location.Location;
 import android.util.Base64;
 import android.util.Log;
 
@@ -16,15 +14,12 @@ import com.android.volley.toolbox.HttpHeaderParser;
 import com.android.volley.toolbox.Volley;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JavaType;
-import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.google.android.gms.auth.api.Auth;
-import com.maraudersapp.android.LoginActivity;
 import com.maraudersapp.android.datamodel.GroupInfo;
 import com.maraudersapp.android.datamodel.LocationInfo;
 import com.maraudersapp.android.datamodel.UserCreationInfo;
 import com.maraudersapp.android.datamodel.UserInfo;
-import com.maraudersapp.android.storage.SharedPrefsUserAccessor;
+import com.maraudersapp.android.storage.SharedPrefsAccessor;
 import com.maraudersapp.android.util.TimeUtil;
 
 import java.io.IOException;
@@ -298,7 +293,7 @@ public class HttpVolleyDispatcher implements ServerComm {
     }
 
     private void addAuth(Map<String, String> headers) {
-        SharedPrefsUserAccessor storage = new SharedPrefsUserAccessor(context);
+        SharedPrefsAccessor storage = new SharedPrefsAccessor(context);
         String username = storage.getUsername();
         String password = storage.getPassword();
 
