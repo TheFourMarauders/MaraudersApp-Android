@@ -29,10 +29,14 @@ import com.maraudersapp.android.storage.SharedPrefsAccessor;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.ConcurrentLinkedDeque;
 
 
 public  final class LocationUpdaterService extends Service
         implements LocationListener, GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
+
+    public LocationUpdaterService() {
+    }
 
     private enum State {
         IDLE, WORKING;
@@ -52,6 +56,8 @@ public  final class LocationUpdaterService extends Service
 
     private ServerComm remote;
     private SharedPrefsAccessor storage;
+
+    private final ConcurrentLinkedDeque<LocationInfo> locationBuffer = new ConcurrentLinkedDeque<>();
 
     static {
         state = State.IDLE;
@@ -132,9 +138,10 @@ public  final class LocationUpdaterService extends Service
 
     private void sendToServer(Location location) {
 
-        List<LocationInfo> locations = new ArrayList<>();
+        final List<LocationInfo> locations = new ArrayList<>(locationBuffer);
         locations.add(new LocationInfo(location));
         // send to server in background thread. you might want to start AsyncTask here
+        locationBuffer.clear();
 
         remote.putLocationsFor(
             storage.getUsername(), locations,
@@ -149,6 +156,7 @@ public  final class LocationUpdaterService extends Service
                 public void onFailure(int errorCode, String message) {
                     Log.i(LocationConstants.LOG_TAG, message);
                     // TODO logout / credential issues
+                    locationBuffer.addAll(locations);
                     onSendingFinished();
                 }
             }
