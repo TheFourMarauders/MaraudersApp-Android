@@ -54,16 +54,53 @@ public class ServerUtil {
         remote.addUserToGroup(groupId, friend,
                 new RemoteCallback<String>() {
 
+                    @Override
+                    public void onSuccess(String response) {
+                        Toast.makeText(ctx, "Friend added!", Toast.LENGTH_SHORT).show();
+                    }
+
+                    @Override
+                    public void onFailure(int errorCode, String message) {
+                        // TODO look at possible failures
+                        Toast.makeText(ctx, "Friend could not be added", Toast.LENGTH_SHORT).show();
+                    }
+                });
+    }
+
+    public static void removeFriend(String username, String target, ServerComm remote, final Context ctx) {
+        Log.i(SERVER_TAG, "Removing friend: " + target);
+        remote.removeFriend(username, target, new RemoteCallback<String>() {
+
             @Override
             public void onSuccess(String response) {
-                Toast.makeText(ctx, "Friend added!", Toast.LENGTH_SHORT).show();
+                Toast.makeText(ctx, "Friend removed!", Toast.LENGTH_SHORT).show();
             }
 
             @Override
             public void onFailure(int errorCode, String message) {
                 // TODO look at possible failures
-                Toast.makeText(ctx, "Friend could not be added", Toast.LENGTH_SHORT).show();
+                Toast.makeText(ctx, "Friend could not be removed", Toast.LENGTH_SHORT).show();
             }
         });
     }
+
+    public static void removeUserFromGroup(String groupId, String friend, ServerComm remote, final Context ctx) {
+        Log.i(SERVER_TAG, "Removing user from group " + groupId);
+        remote.removeUserFromGroup(groupId, friend,
+                new RemoteCallback<String>() {
+
+                    @Override
+                    public void onSuccess(String response) {
+                        Toast.makeText(ctx, "User from group removed!", Toast.LENGTH_SHORT).show();
+                    }
+
+                    @Override
+                    public void onFailure(int errorCode, String message) {
+                        // TODO look at possible failures
+                        Toast.makeText(ctx, "User from group could not be removed", Toast.LENGTH_SHORT).show();
+                    }
+                });
+    }
+
+
 }

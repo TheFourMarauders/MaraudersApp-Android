@@ -69,6 +69,10 @@ public class PollingManager {
         currentPoller.onPlusPressed(ctx);
     }
 
+    public void onMinusPressed(Activity ctx) {
+        currentPoller.onMinusPressed(ctx);
+    }
+
     public Poller newFriendPoller(String username, Context ctx) {
         return new FriendPoller(pollHandler, googleMap, ctx, username);
     }

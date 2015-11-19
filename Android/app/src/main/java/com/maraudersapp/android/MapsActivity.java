@@ -139,9 +139,14 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         switch (item.getItemId()) {
             case R.id.plus_button:
                 pollingManager.onPlusPressed(MapsActivity.this);
+                break;
+            case R.id.minus_button:
+                pollingManager.onMinusPressed(MapsActivity.this);
+                break;
             default:
                 return super.onOptionsItemSelected(item);
         }
+        return true;
     }
 
     @Override
