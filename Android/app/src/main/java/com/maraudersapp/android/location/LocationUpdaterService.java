@@ -123,6 +123,7 @@ public  final class LocationUpdaterService extends Service
         super.onDestroy();
         state = State.IDLE;
         if(mGoogleApiClient.isConnected()) {
+            Log.i(LocationConstants.LOG_TAG, "Location API disconnected");
             mGoogleApiClient.disconnect();
         }
         if (this.wakeLock.isHeld()) {
@@ -165,16 +166,16 @@ public  final class LocationUpdaterService extends Service
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
 
-        mLocationRequest = LocationRequest.create();
-        mLocationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
-        mGoogleApiClient = new GoogleApiClient.Builder(this).addApi(LocationServices.API)
-                .addConnectionCallbacks(this).addOnConnectionFailedListener(this).build();
-        mGoogleApiClient.connect();
-
         if (state == State.IDLE) {
             state = State.WORKING;
             this.wakeLock.acquire();
             Log.i(LocationConstants.LOG_TAG, "Location onStartCommand. Starting location.");
+
+            mLocationRequest = LocationRequest.create();
+            mLocationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
+            mGoogleApiClient = new GoogleApiClient.Builder(this).addApi(LocationServices.API)
+                    .addConnectionCallbacks(this).addOnConnectionFailedListener(this).build();
+            mGoogleApiClient.connect();
         }
 
         return START_STICKY;
