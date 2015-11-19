@@ -3,15 +3,16 @@ package com.maraudersapp.android.location;
 import com.maraudersapp.android.datamodel.LocationInfo;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 /**
  * Created by joe on 11/16/15.
  */
 public class HaversineCompressor implements LocationCompressor {
-    private static final double EARTH_RAD = 6.371e6;
-    private static final double MIN_DIFF = 50;
-    float[] results = new float[1];
+    //private static final double EARTH_RAD = 6.371e6;
+    private static final double MIN_DIFF = 20;
+
     @Override
     public List<LocationInfo> filter(List<LocationInfo> allLocations) {
         List<LocationInfo> filtered = new ArrayList<>();
@@ -24,6 +25,7 @@ public class HaversineCompressor implements LocationCompressor {
                 prevAdded = maybeAdd;
             }
         }
+        Collections.reverse(filtered);
         return filtered;
     }
 

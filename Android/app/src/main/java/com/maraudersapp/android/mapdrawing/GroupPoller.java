@@ -17,7 +17,6 @@ import com.maraudersapp.android.InputDialog;
 import com.maraudersapp.android.R;
 import com.maraudersapp.android.datamodel.LocationInfo;
 import com.maraudersapp.android.datamodel.UserInfo;
-import com.maraudersapp.android.location.AndroidCompressor;
 import com.maraudersapp.android.location.HaversineCompressor;
 import com.maraudersapp.android.remote.RemoteCallback;
 import com.maraudersapp.android.util.ServerUtil;

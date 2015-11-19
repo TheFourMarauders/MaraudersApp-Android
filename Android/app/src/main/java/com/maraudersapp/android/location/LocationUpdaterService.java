@@ -29,10 +29,14 @@ import com.maraudersapp.android.storage.SharedPrefsAccessor;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.ConcurrentLinkedDeque;
 
 
 public  final class LocationUpdaterService extends Service
         implements LocationListener, GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
+
+    public LocationUpdaterService() {
+    }
 
     private enum State {
         IDLE, WORKING;
@@ -52,6 +56,8 @@ public  final class LocationUpdaterService extends Service
 
     private ServerComm remote;
     private SharedPrefsAccessor storage;
+
+    private static final ConcurrentLinkedDeque<LocationInfo> locationBuffer = new ConcurrentLinkedDeque<>();
 
     static {
         state = State.IDLE;
@@ -76,18 +82,18 @@ public  final class LocationUpdaterService extends Service
                 activeNetwork.isConnectedOrConnecting();
         Log.i(LocationConstants.LOG_TAG, "Attempting to schedule location update. Network on?: " + hasNetwork);
 
-        if (hasNetwork) {
+        //if (hasNetwork) {
             // start service now for doing once
-            context.startService(new Intent(context, LocationUpdaterService.class));
+        context.startService(new Intent(context, LocationUpdaterService.class));
 
             // TODO change back
             // schedule service for every minute
-            alarmManager.setInexactRepeating(AlarmManager.ELAPSED_REALTIME_WAKEUP,
-                    SystemClock.elapsedRealtime(),
-                    LocationConstants.GPS_INTERVAL, wakeupIntent);
-        } else {
-            alarmManager.cancel(wakeupIntent);
-        }
+        alarmManager.setInexactRepeating(AlarmManager.ELAPSED_REALTIME_WAKEUP,
+                SystemClock.elapsedRealtime(),
+                LocationConstants.GPS_INTERVAL, wakeupIntent);
+        //} else {
+        //    alarmManager.cancel(wakeupIntent);
+        //}
     }
 
     public static void stopLocationPolling(Context context) {
@@ -133,9 +139,10 @@ public  final class LocationUpdaterService extends Service
 
     private void sendToServer(Location location) {
 
-        List<LocationInfo> locations = new ArrayList<>();
+        final List<LocationInfo> locations = new ArrayList<>(locationBuffer);
         locations.add(new LocationInfo(location));
         // send to server in background thread. you might want to start AsyncTask here
+        locationBuffer.clear();
 
         remote.putLocationsFor(
             storage.getUsername(), locations,
@@ -148,8 +155,10 @@ public  final class LocationUpdaterService extends Service
 
                 @Override
                 public void onFailure(int errorCode, String message) {
-                    Log.i(LocationConstants.LOG_TAG, message);
+                    Log.i("Location: send failure", message);
                     // TODO logout / credential issues
+                    locationBuffer.addAll(locations);
+                    Log.i("Location Buffer: ", locationBuffer.toString());
                     onSendingFinished();
                 }
             }
