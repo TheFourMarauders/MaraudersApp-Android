@@ -15,6 +15,7 @@ import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.maraudersapp.android.InputDialog;
 import com.maraudersapp.android.R;
+import com.maraudersapp.android.datamodel.GroupInfo;
 import com.maraudersapp.android.datamodel.LocationInfo;
 import com.maraudersapp.android.datamodel.UserInfo;
 import com.maraudersapp.android.location.HaversineCompressor;
@@ -107,11 +108,11 @@ public class GroupPoller extends Poller {
     }
 
     public void onMinusPressed(final Activity ctx) {
-        remote.getFriendsFor(storage.getUsername(),
-                new RemoteCallback<Set<UserInfo>>() {
+        remote.getGroupById(groupId,
+                new RemoteCallback<GroupInfo>() {
                     @Override
-                    public void onSuccess(Set<UserInfo> response) {
-                        showRemoveGroupPicker(ctx, new ArrayList<>(response));
+                    public void onSuccess(GroupInfo response) {
+                        showRemoveMemberFromGroupPicker(ctx, new ArrayList<String>(response.getMembers()));
                     }
 
                     @Override
@@ -150,25 +151,25 @@ public class GroupPoller extends Poller {
         sheet.show();
     }
 
-    private void showRemoveGroupPicker(final Activity ctx, final List<UserInfo> friends) {
+    private void showRemoveMemberFromGroupPicker(final Activity ctx, final List<String> groupMembers) {
 
-        BottomSheet sheet = new BottomSheet.Builder(ctx).title("Remove friend from " + groupName + ":").sheet(R.menu.dynamic_menu)
+        BottomSheet sheet = new BottomSheet.Builder(ctx).title("Remove member from " + groupName).sheet(R.menu.dynamic_menu)
                 .listener(new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        String friendToRemove = friends.get(which).getUsername();
-                        ServerUtil.removeUserFromGroup(groupId, friendToRemove, remote, ctx);
+                        String memberToRemove = groupMembers.get(which);
+                        ServerUtil.removeUserFromGroup(groupId, memberToRemove, remote, ctx);
                     }
                 }).build();
 
         Menu menu = sheet.getMenu();
 
         // Populate pop-up menu
-        for (int i = 0; i < friends.size(); i++) {
-            UserInfo user = friends.get(i);
-            if (!members.contains(user.getUsername())) {
-                menu.add(Menu.NONE, i, Menu.NONE, user.getFirstName() + " " + user.getLastName());
-            }
+        for (int i = 0; i < groupMembers.size(); i++) {
+            String member = groupMembers.get(i);
+            //if (!members.contains(member)) {
+                menu.add(Menu.NONE, i, Menu.NONE, member);
+           // }
         }
 
         sheet.show();
