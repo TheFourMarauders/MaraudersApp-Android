@@ -127,12 +127,13 @@ public class MainDrawerView extends DrawerView {
                         public void onCheckedChanged(IDrawerItem iDrawerItem, CompoundButton compoundButton, boolean b) {
                             if (storage.isIncognito()) {
                                 Log.i(DRAWER_TAG, "Stopping Incognito");
+                                storage.setIncognito(false);
                                 LocationUpdaterService.scheduleLocationPolling(ctx);
                             } else {
                                 Log.i(DRAWER_TAG, "Incognito started");
+                                storage.setIncognito(true);
                                 LocationUpdaterService.stopLocationPolling(ctx);
                             }
-                            storage.setIncognito(!storage.isIncognito());
                         }
                     })) {
 

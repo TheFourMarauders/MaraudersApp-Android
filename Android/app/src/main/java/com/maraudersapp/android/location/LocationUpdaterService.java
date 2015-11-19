@@ -84,13 +84,16 @@ public  final class LocationUpdaterService extends Service
 
         //if (hasNetwork) {
             // start service now for doing once
-        context.startService(new Intent(context, LocationUpdaterService.class));
+        if (!new SharedPrefsAccessor(context).isIncognito()) {
+            Log.i(LocationConstants.LOG_TAG, "Incognito off. Going for location");
+            context.startService(new Intent(context, LocationUpdaterService.class));
 
             // TODO change back
             // schedule service for every minute
-        alarmManager.setInexactRepeating(AlarmManager.ELAPSED_REALTIME_WAKEUP,
-                SystemClock.elapsedRealtime(),
-                LocationConstants.GPS_INTERVAL, wakeupIntent);
+            alarmManager.setInexactRepeating(AlarmManager.ELAPSED_REALTIME_WAKEUP,
+                    SystemClock.elapsedRealtime(),
+                    LocationConstants.GPS_INTERVAL, wakeupIntent);
+        }
         //} else {
         //    alarmManager.cancel(wakeupIntent);
         //}
