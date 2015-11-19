@@ -7,9 +7,9 @@
         android:icon="@mipmap/ic_launcher_plus_button"
         android:title="Button"
         android:showAsAction="ifRoom"/>
-    <group android:checkableBehavior="single">
-        <item
-            android:id="@+id/nav_first_fragment"
-            android:title="Settings" />
-    </group>
+    <item
+        android:id="@+id/minus_button"
+        android:icon="@mipmap/ic_remove_white_24dp"
+        android:title="MinusButton"
+        android:showAsAction="ifRoom"/>
 </menu>

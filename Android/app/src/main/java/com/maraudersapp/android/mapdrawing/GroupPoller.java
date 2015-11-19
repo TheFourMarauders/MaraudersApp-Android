@@ -106,6 +106,23 @@ public class GroupPoller extends Poller {
                 });
     }
 
+    public void onMinusPressed(final Activity ctx) {
+        remote.getFriendsFor(storage.getUsername(),
+                new RemoteCallback<Set<UserInfo>>() {
+                    @Override
+                    public void onSuccess(Set<UserInfo> response) {
+                        showRemoveGroupPicker(ctx, new ArrayList<>(response));
+                    }
+
+                    @Override
+                    public void onFailure(int errorCode, String message) {
+                        // TODO
+                    }
+                });
+    }
+
+
+
     /**
      * Shows add friend dialog
      */
@@ -117,6 +134,30 @@ public class GroupPoller extends Poller {
                     public void onClick(DialogInterface dialog, int which) {
                         String friendToAdd = friends.get(which).getUsername();
                         ServerUtil.addFriendToGroup(groupId, friendToAdd, remote, ctx);
+                    }
+                }).build();
+
+        Menu menu = sheet.getMenu();
+
+        // Populate pop-up menu
+        for (int i = 0; i < friends.size(); i++) {
+            UserInfo user = friends.get(i);
+            if (!members.contains(user.getUsername())) {
+                menu.add(Menu.NONE, i, Menu.NONE, user.getFirstName() + " " + user.getLastName());
+            }
+        }
+
+        sheet.show();
+    }
+
+    private void showRemoveGroupPicker(final Activity ctx, final List<UserInfo> friends) {
+
+        BottomSheet sheet = new BottomSheet.Builder(ctx).title("Remove friend from " + groupName + ":").sheet(R.menu.dynamic_menu)
+                .listener(new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        String friendToRemove = friends.get(which).getUsername();
+                        ServerUtil.removeUserFromGroup(groupId, friendToRemove, remote, ctx);
                     }
                 }).build();
 

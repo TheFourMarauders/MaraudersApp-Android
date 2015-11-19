@@ -10,5 +10,4 @@
         android:title="Create a Group"
         android:icon="@mipmap/ic_launcher"
         />
-
 </menu>
