@@ -38,12 +38,15 @@ public class DrawerManager {
         this.currentDrawerView = mainDrawerView;
     }
 
+    public boolean atMainView() {
+        return this.atMainView;
+    }
+
     public void switchView(DrawerView drawerView) {
         Log.i("Drawer", drawerView.getAllItems().size() + " ");
-        //drawer.switchDrawerContent(drawerView, drawerView.getAllItems(), 0);
+        atMainView = false;
         drawer.setItems(drawerView.getAllItems());
         drawer.setOnDrawerItemClickListener(drawerView);
-        atMainView = false;
         this.currentDrawerView = drawerView;
     }
 
@@ -65,10 +68,10 @@ public class DrawerManager {
             return false;
         } else if (!atMainView) {
             currentDrawerView.cleanup();
-            //drawer.resetDrawerContent();
+            atMainView = true;
+            mainDrawerView = new MainDrawerView(mainDrawerView);
             drawer.setItems(mainDrawerView.getAllItems());
             drawer.setOnDrawerItemClickListener(mainDrawerView);
-            atMainView = true;
             currentDrawerView = mainDrawerView;
             return true;
         } else {

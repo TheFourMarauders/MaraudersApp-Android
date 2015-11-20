@@ -15,6 +15,9 @@ public class HaversineCompressor implements LocationCompressor {
 
     @Override
     public List<LocationInfo> filter(List<LocationInfo> allLocations) {
+        if (allLocations == null || allLocations.isEmpty()) {
+            return allLocations;
+        }
         List<LocationInfo> filtered = new ArrayList<>();
         LocationInfo prevAdded = allLocations.get(allLocations.size() - 1);
         filtered.add(prevAdded);

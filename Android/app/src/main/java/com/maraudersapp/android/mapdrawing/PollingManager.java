@@ -56,11 +56,13 @@ public class PollingManager {
     }
 
     public void stopPolling() {
+        currentPoller.removeAllMarkings();
         pollHandler.removeCallbacks(currentPoller);
     }
 
     public void continuePolling() {
         if (currentPoller != null) {
+            stopPolling();
             pollHandler.postDelayed(currentPoller, 0);
         }
     }

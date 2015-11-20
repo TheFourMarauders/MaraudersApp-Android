@@ -125,14 +125,16 @@ public class MainDrawerView extends DrawerView {
                     .withOnCheckedChangeListener(new OnCheckedChangeListener() {
                         @Override
                         public void onCheckedChanged(IDrawerItem iDrawerItem, CompoundButton compoundButton, boolean b) {
-                            if (storage.isIncognito()) {
-                                Log.i(DRAWER_TAG, "Stopping Incognito");
-                                storage.setIncognito(false);
-                                LocationUpdaterService.scheduleLocationPolling(ctx);
-                            } else {
-                                Log.i(DRAWER_TAG, "Incognito started");
-                                storage.setIncognito(true);
-                                LocationUpdaterService.stopLocationPolling(ctx);
+                            if (drawerManager.atMainView()) {
+                                if (storage.isIncognito()) {
+                                    Log.i(DRAWER_TAG, "Stopping Incognito");
+                                    storage.setIncognito(false);
+                                    LocationUpdaterService.scheduleLocationPolling(ctx);
+                                } else {
+                                    Log.i(DRAWER_TAG, "Incognito started");
+                                    storage.setIncognito(true);
+                                    LocationUpdaterService.stopLocationPolling(ctx);
+                                }
                             }
                         }
                     })) {
@@ -153,7 +155,6 @@ public class MainDrawerView extends DrawerView {
                             drawerManager, pollingManager, ctx);
                     drawerManager.switchView(newView);
                 }
-
             },
 
             // Logout
@@ -172,6 +173,10 @@ public class MainDrawerView extends DrawerView {
     public MainDrawerView(ServerComm remote, SharedPrefsAccessor storage, DrawerManager drawerManager,
                           PollingManager pollingManager, Context ctx) {
         super(remote, storage, drawerManager, pollingManager, ctx);
+    }
+
+    public MainDrawerView(DrawerView cpyMe) {
+        this(cpyMe.remote,  cpyMe.storage, cpyMe.drawerManager, cpyMe.pollingManager, cpyMe.ctx);
     }
 
     @Override

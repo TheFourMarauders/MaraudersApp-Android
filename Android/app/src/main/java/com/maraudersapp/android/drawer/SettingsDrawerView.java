@@ -172,6 +172,7 @@ public class SettingsDrawerView extends DrawerView {
                 customStart.withName("Custom: " + TimeUtil.dateToNiceString(storage.getStartTime()));
                 customEnd.withName("Custom: " + TimeUtil.dateToNiceString(storage.getEndTime()));
                 drawerManager.updateAllItems();
+                pollingManager.continuePolling();
                 alertDialog.dismiss();
             }
         });
