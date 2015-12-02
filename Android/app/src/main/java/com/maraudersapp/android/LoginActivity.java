@@ -22,7 +22,7 @@ import butterknife.ButterKnife;
 import butterknife.InjectView;
 
 /**
- * Created by brent on 10/8/15.
+ * Activity displayed when user needs to login.
  */
 public class LoginActivity extends AppCompatActivity {
 
@@ -38,6 +38,9 @@ public class LoginActivity extends AppCompatActivity {
     @InjectView(R.id.login_button) Button loginButton;
     @InjectView(R.id.link_signup) TextView signUp;
 
+    /**
+     * Registers login and signup button callbacks.
+     */
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -84,7 +87,12 @@ public class LoginActivity extends AppCompatActivity {
         storage = new SharedPrefsAccessor(getApplicationContext());
     }
 
+    /**
+     * Logs the user in with the current text in the username and password input boxes.
+     */
     public void login() {
+
+        // If username and password not valid, login failed
         if (!validate()) {
             onLoginFailed();
             return;
@@ -104,6 +112,8 @@ public class LoginActivity extends AppCompatActivity {
             onLoginFailed();
             return;
         }
+
+        // Checking if login worked
         remote.getFriendsFor(username, new RemoteCallback<Set<UserInfo>>() {
             @Override
             public void onSuccess(Set<UserInfo> response) {
@@ -134,6 +144,9 @@ public class LoginActivity extends AppCompatActivity {
         moveTaskToBack(true);
     }
 
+    /**
+     * Called when login succeeds to start the main activity.
+     */
     public void onLoginSuccess() {
         if(!mustNullify || !isInitial) {
             Toast.makeText(getBaseContext(), "Login Successful!", Toast.LENGTH_LONG).show();
@@ -143,6 +156,9 @@ public class LoginActivity extends AppCompatActivity {
         startActivity(i);
     }
 
+    /**
+     * Called when login failed to retry login.
+     */
     public void onLoginFailed() {
         storage.clearCredentials();
         if(!mustNullify || !isInitial) {
@@ -151,6 +167,10 @@ public class LoginActivity extends AppCompatActivity {
         loginButton.setEnabled(true);
     }
 
+    /**
+     *
+     * @return true if username/pass is valid. False otherwise.
+     */
     public boolean validate() {
         boolean valid = true;
         String username = usernameText.getText().toString();
@@ -177,6 +197,9 @@ public class LoginActivity extends AppCompatActivity {
         return valid;
     }
 
+    /**
+     * Checks login for users already in the system.
+     */
     public void checkLogin() {
         System.out.println("Checking");
         String username = storage.getUsername();

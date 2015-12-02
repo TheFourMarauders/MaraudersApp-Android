@@ -8,12 +8,18 @@ import com.maraudersapp.android.remote.RemoteCallback;
 import com.maraudersapp.android.remote.ServerComm;
 
 /**
- * Created by Michael on 11/3/2015.
+ * Multiple helper methods for communicating with server endpoints.
  */
 public class ServerUtil {
 
     private static final String SERVER_TAG = "SERVER";
 
+    /**
+     * Sends a friend request from a user to another user. Displays Toast on result.
+     *
+     * @param usernameTo Username for user sending the friend request.
+     * @param usernameFrom Username for user receiving the friend request.
+     */
     public static void sendFriendRequest(String usernameTo, String usernameFrom, ServerComm remote, final Context ctx) {
         Log.i(SERVER_TAG, "Sending request to: " + usernameTo);
         remote.sendFriendRequest(usernameFrom, usernameTo,
@@ -32,6 +38,11 @@ public class ServerUtil {
                 });
     }
 
+    /**
+     * Creates a group with no users. Displays Toast on result.
+     *
+     * @param groupName name of group to create
+     */
     public static void addGroup(String groupName, ServerComm remote, final Context ctx) {
         Log.i(SERVER_TAG, "Creating group: " + groupName);
         remote.createGroup(groupName, new RemoteCallback<String>() {
@@ -49,6 +60,12 @@ public class ServerUtil {
         });
     }
 
+    /**
+     * Adds a user to a group. Displays Toast on result.
+     *
+     * @param groupId group ID for the group
+     * @param friend username to add to the group
+     */
     public static void addFriendToGroup(String groupId, String friend, ServerComm remote, final Context ctx) {
         Log.i(SERVER_TAG, "Adding user " + friend + " to group: " + groupId);
         remote.addUserToGroup(groupId, friend,
@@ -67,6 +84,12 @@ public class ServerUtil {
                 });
     }
 
+    /**
+     * Removes a friend from a certain user. Displays Toast on result.
+     *
+     * @param username Username to remove the friend from.
+     * @param target Username of friend to remove.
+     */
     public static void removeFriend(String username, String target, ServerComm remote, final Context ctx) {
         Log.i(SERVER_TAG, "Removing friend: " + target);
         remote.removeFriend(username, target, new RemoteCallback<String>() {
@@ -84,6 +107,12 @@ public class ServerUtil {
         });
     }
 
+    /**
+     * Removes user from a group.  Displays Toast on result.
+     *
+     * @param groupId group ID of group.
+     * @param friend username of person to remove.
+     */
     public static void removeUserFromGroup(String groupId, String friend, ServerComm remote, final Context ctx) {
         Log.i(SERVER_TAG, "Removing user from group " + groupId);
         remote.removeUserFromGroup(groupId, friend,

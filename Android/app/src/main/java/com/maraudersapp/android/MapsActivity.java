@@ -34,7 +34,9 @@ import com.mikepenz.materialdrawer.model.ProfileDrawerItem;
 /**
  * Main activity that displays the map that the users can interact with.
  *
- * Extends AppCompatActivity for Toolbar use.
+ * <p>Main UI occurs through the use of the navigation drawer.</p>
+ *
+ * <p>Extends AppCompatActivity for Toolbar use.</p>
  */
 public class MapsActivity extends AppCompatActivity implements OnMapReadyCallback {
 
@@ -53,6 +55,9 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     private DrawerManager drawerManager;
     private PollingManager pollingManager;
 
+    /**
+     * Initializes the map and loads any state that already exists.
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -86,11 +91,19 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         }
     }
 
+    /**
+     * Creates new state. Used when no previous state for the activity exists.
+     */
     private InstanceData initializeState() {
         pollingManager = new PollingManager();
         return new InstanceData("Your History", pollingManager);
     }
 
+    /**
+     * Initializes state from previous existing state.
+     *
+     * @param state previous state
+     */
     private void loadInstanceState(StateFragment state) {
         InstanceData stateData = state.getData();
         pollingManager = stateData.getPollingManager();
@@ -127,6 +140,9 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         drawerManager = new DrawerManager(mDrawer, mToolbar, this, pollingManager);
     }
 
+    /**
+     * Inflates the toolbar (top menu).
+     */
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = new MenuInflater(this);
@@ -161,8 +177,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     /**
      * Manipulates the map once available.
      * This callback is triggered when the map is ready to be used.
-     * This is where we can add markers or lines, add listeners or move the camera. In this case,
-     * we just add a marker near Sydney, Australia.
+     *
      * If Google Play services is not installed on the device, the user will be prompted to install
      * it inside the SupportMapFragment. This method will only be triggered once the user has
      * installed Google Play services and returned to the app.

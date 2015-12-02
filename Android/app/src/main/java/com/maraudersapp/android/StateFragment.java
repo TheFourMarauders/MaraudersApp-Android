@@ -9,7 +9,7 @@ import com.maraudersapp.android.mapdrawing.PollingManager;
 import com.mikepenz.materialdrawer.Drawer;
 
 /**
- * Created by Michael on 11/4/2015.
+ * Stores state inside a persistant fragment that will not be destroyed.
  */
 public class StateFragment extends Fragment {
 
@@ -23,6 +23,9 @@ public class StateFragment extends Fragment {
         setRetainInstance(true);
     }
 
+    /**
+     * Sets the data to be stored.
+     */
     public void setData(InstanceData data) {
         this.data = data;
     }
@@ -31,6 +34,10 @@ public class StateFragment extends Fragment {
         return data;
     }
 
+    /**
+     * Instance data that is needed for the MapsActivity.
+     * Stores the title of the activity and the polling manager.
+     */
     public static class InstanceData {
 
         private String title;
