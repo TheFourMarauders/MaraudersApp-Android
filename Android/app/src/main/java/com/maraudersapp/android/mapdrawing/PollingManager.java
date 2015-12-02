@@ -18,6 +18,8 @@ import java.util.Collection;
 import java.util.logging.LogRecord;
 
 /**
+ * Manages all the friends, groups, and users poller and chooses when to poll for locations
+ *
  * Created by Michael on 10/28/2015.
  */
 public class PollingManager {
@@ -48,6 +50,11 @@ public class PollingManager {
         }
     }
 
+    /**
+     * Changees current poller to poller passed in
+     *
+     * @param poller to change to
+     */
     public void changePoller(Poller poller) {
         currentPoller.removeAllMarkings();
         pollHandler.removeCallbacks(currentPoller);
@@ -55,6 +62,9 @@ public class PollingManager {
         currentPoller = poller;
     }
 
+    /**
+     * Stops retrieving new locations and removes markings on screen
+     */
     public void stopPolling() {
         currentPoller.removeAllMarkings();
         pollHandler.removeCallbacks(currentPoller);
@@ -75,14 +85,36 @@ public class PollingManager {
         currentPoller.onMinusPressed(ctx);
     }
 
+    /**
+     * Gets a new friend poller object
+     *
+     * @param username friends username
+     * @param ctx
+     * @return a new friend poller
+     */
     public Poller newFriendPoller(String username, Context ctx) {
         return new FriendPoller(pollHandler, googleMap, ctx, username);
     }
 
+    /**
+     * Gets a new group poller object
+     *
+     * @param id the id of the group
+     * @param groupName name of group
+     * @param members the members of the group
+     * @param ctx
+     * @return a new group poller
+     */
     public Poller newGroupPoller(String id, String groupName, Collection<String> members, Context ctx) {
         return new GroupPoller(pollHandler, googleMap, ctx, id, groupName, members);
     }
 
+    /**
+     * Gets a new user poller object
+     *
+     * @param ctx
+     * @return a new user poller
+     */
     public Poller newUserPoller(Context ctx) {
         return new UserPoller(pollHandler, googleMap, ctx);
     }

@@ -20,11 +20,24 @@ import java.util.Set;
 
 /**
  * Created by Michael on 10/27/2015.
+ *
+ * Drawer that is displayed when the user clicks on the friends button in the main drawer view
  */
 public class FriendsDrawerView extends DrawerView {
 
     private List<DrawerItem> drawerItems;
 
+    /**
+     * Constructor for drawer displayed when we click "friends"
+     *
+     * @param remote
+     * @param storage
+     * @param drawerManager
+     * @param pm
+     * @param ctx
+     * @param friends our current friends
+     * @param friendRequests friendrequest that are displayed in our new drawer
+     */
     public FriendsDrawerView(final ServerComm remote, final SharedPrefsAccessor storage,
                              final DrawerManager drawerManager, PollingManager pm, final Context ctx,
                              Set<UserInfo> friends, Set<UserInfo> friendRequests) {

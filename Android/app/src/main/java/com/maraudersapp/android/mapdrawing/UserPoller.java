@@ -19,6 +19,8 @@ import java.util.Date;
 import java.util.List;
 
 /**
+ * User Poller that displays the current user's location on the map
+ *
  * Created by Michael on 10/29/2015.
  */
 public class UserPoller extends Poller {
@@ -32,6 +34,9 @@ public class UserPoller extends Poller {
         username = storage.getUsername();
     }
 
+    /**
+     * Retrieves the locations of currently logged in user and displays them on the map
+     */
     @Override
     public void run() {
         remote.getLocationsFor(username,

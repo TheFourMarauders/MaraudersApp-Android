@@ -19,6 +19,8 @@ import java.util.Date;
 import java.util.List;
 
 /**
+ * This class displays friends locations on the map
+ *
  * Created by Michael on 10/28/2015.
  */
 public class FriendPoller extends Poller {
@@ -26,12 +28,24 @@ public class FriendPoller extends Poller {
     private final String username;
     private List<Marker> currentMarkers;
 
+    /**
+     * Constructs a new friend poller to display location in other classes
+     *
+     * @param handler
+     * @param googleMap the map that is on the screen
+     * @param ctx
+     * @param username username of the friend to retrieve
+     */
     FriendPoller(Handler handler, GoogleMap googleMap, Context ctx, String username) {
         super(handler, googleMap, ctx);
         this.username = username;
         currentMarkers = new ArrayList<>();
     }
 
+    /**
+     * Gets the locations of the friend and tries to display them on the map if they are
+     * far enough away from each other
+     */
     @Override
     public void run() {
         remote.getLocationsFor(username,
@@ -65,6 +79,9 @@ public class FriendPoller extends Poller {
         handler.postDelayed(this, PollingManager.POLL_INTERVAL);
     }
 
+    /**
+     * Removes the markers on the map
+     */
     void removeAllMarkings() {
         for (Marker marker : currentMarkers) {
             marker.remove();

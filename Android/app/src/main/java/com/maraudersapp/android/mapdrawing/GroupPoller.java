@@ -31,6 +31,8 @@ import java.util.Map;
 import java.util.Set;
 
 /**
+ * Displays the group location on the map and the different members within the group
+ *
  * Created by Michael on 10/29/2015.
  */
 public class GroupPoller extends Poller {
@@ -48,6 +50,9 @@ public class GroupPoller extends Poller {
         currentMarkers = new ArrayList<>();
     }
 
+    /**
+     * Displays the locations of the group members in the group with different colors for each user
+     */
     @Override
     public void run() {
         remote.getGroupLocations(groupId,
@@ -123,9 +128,11 @@ public class GroupPoller extends Poller {
     }
 
 
-
     /**
-     * Shows add friend dialog
+     * Displays the friends of the user that they might want to add to a group
+     *
+     * @param ctx
+     * @param friends friends of the user
      */
     private void showFriendPicker(final Activity ctx, final List<UserInfo> friends) {
 
@@ -151,6 +158,12 @@ public class GroupPoller extends Poller {
         sheet.show();
     }
 
+    /**
+     * Displays the group members to remove from the currently displayed group
+     *
+     * @param ctx
+     * @param groupMembers list of group members, including current user
+     */
     private void showRemoveMemberFromGroupPicker(final Activity ctx, final List<String> groupMembers) {
 
         BottomSheet sheet = new BottomSheet.Builder(ctx).title("Remove member from " + groupName).sheet(R.menu.dynamic_menu)
