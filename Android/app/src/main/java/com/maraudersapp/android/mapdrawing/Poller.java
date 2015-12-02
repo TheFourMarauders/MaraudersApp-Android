@@ -25,6 +25,8 @@ import java.util.List;
 import java.util.Set;
 
 /**
+ * Class that represents a screen which can be drawable
+ *
  * Created by Michael on 10/28/2015.
  */
 public abstract class Poller implements Runnable {
@@ -51,7 +53,9 @@ public abstract class Poller implements Runnable {
     }
 
     /**
-     * Assuming a poller represents a screen, what should happen when plus is pressed on that screen
+     * Default method for when the plus button is pressed
+     *
+     * @param ctx
      */
     public void onPlusPressed(final Activity ctx) {
         // Display "Create" dialog at the bottom of the screen.
@@ -86,6 +90,11 @@ public abstract class Poller implements Runnable {
         }).show();
     }
 
+    /**
+     * Default method for when the minus button is pressed
+     *
+     * @param ctx
+     */
     public void onMinusPressed(final Activity ctx) {
         new BottomSheet.Builder(ctx).title("Remove...").sheet(R.menu.remove).listener(new DialogInterface.OnClickListener() {
             @Override
@@ -111,6 +120,12 @@ public abstract class Poller implements Runnable {
         }).show();
     }
 
+    /**
+     * Helper method for the minus button
+     *
+     * @param ctx
+     * @param friends list of friends to remove from the current user's friend list
+     */
     private void showRemoveFriendPicker(final Activity ctx, final List<UserInfo> friends) {
 
         BottomSheet sheet = new BottomSheet.Builder(ctx).title("Click friend to remove").sheet(R.menu.dynamic_menu)

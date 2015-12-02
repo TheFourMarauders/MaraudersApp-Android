@@ -31,7 +31,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ConcurrentLinkedDeque;
 
-
+/**
+ * This class retrieves the location via polling and chooses when to update the location or stop
+ * location updates
+ */
 public  final class LocationUpdaterService extends Service
         implements LocationListener, GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
 
@@ -66,7 +69,10 @@ public  final class LocationUpdaterService extends Service
 
     //TODO begin alarm on startup
     /**
-     * We need data because aGPS needs data to retreive location.
+     * Scheduling polling because based on network availability to poll for locations. Checks
+     * if user is incognito as well
+     *
+     * @param context
      */
     public static void scheduleLocationPolling(Context context) {
         final AlarmManager alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
@@ -99,6 +105,11 @@ public  final class LocationUpdaterService extends Service
         //}
     }
 
+    /**
+     * Stops polling for location updates
+     *
+     * @param context
+     */
     public static void stopLocationPolling(Context context) {
         final AlarmManager alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
         // Same intents will overwrite any existing previous one :)
@@ -140,6 +151,11 @@ public  final class LocationUpdaterService extends Service
         }
     }
 
+    /**
+     * Send location to server if there are any
+     *
+     * @param location
+     */
     private void sendToServer(Location location) {
 
         final List<LocationInfo> locations = new ArrayList<>(locationBuffer);
@@ -205,6 +221,11 @@ public  final class LocationUpdaterService extends Service
 
     }
 
+    /**
+     * Location is changed, so we will send our new location to the server
+     *
+     * @param location new location
+     */
     @Override
     public void onLocationChanged(Location location) {
         Log.i(LocationConstants.LOG_TAG, "onLocationChanged " + location.getProvider().toString());

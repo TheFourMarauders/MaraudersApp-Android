@@ -11,6 +11,8 @@ import java.util.Date;
 
 /**
  * Created by joe on 10/16/15.
+ *
+ * Model for location: latitude, longtitude, time
  */
 public class LocationInfo {
     private double latitude, longitude;

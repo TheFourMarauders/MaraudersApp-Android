@@ -5,6 +5,8 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 /**
  * Created by joe on 10/16/15.
+ *
+ * Model for user creation: username, password, firstname, lastname
  */
 public class UserCreationInfo {
     private String username, password, firstName, lastName;

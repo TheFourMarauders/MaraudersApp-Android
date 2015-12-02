@@ -14,6 +14,8 @@ import java.util.Collection;
 
 /**
  * Created by Michael on 10/27/2015.
+ *
+ * This abstract class is the view for the menu drawer displayed on the right side
  */
 public abstract class DrawerView implements Drawer.OnDrawerItemClickListener {
 
@@ -26,6 +28,16 @@ public abstract class DrawerView implements Drawer.OnDrawerItemClickListener {
     protected final PollingManager pollingManager;
     protected final Context ctx;
 
+    /**
+     * Constructor for the drawer view
+     *
+     *
+     * @param remote communication to our server
+     * @param storage shared prefs accesses user credentials
+     * @param drawerManager defined class from library we use
+     * @param pollingManager our polling manager
+     * @param ctx
+     */
     public DrawerView(ServerComm remote, SharedPrefsAccessor storage, DrawerManager drawerManager,
                       PollingManager pollingManager, Context ctx) {
         this.storage = storage;

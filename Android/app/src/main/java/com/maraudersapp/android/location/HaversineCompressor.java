@@ -8,11 +8,20 @@ import java.util.List;
 
 /**
  * Created by joe on 11/16/15.
+ *
+ * This class calculates the distance between two points and determines whether to display
+ * points that are close together on gps
  */
 public class HaversineCompressor implements LocationCompressor {
     //private static final double EARTH_RAD = 6.371e6;
     private static final double MIN_DIFF = 20;
 
+    /**
+     * Filters the locations based on haversine distance
+     *
+     * @param allLocations
+     * @return list of locations that are viable
+     */
     @Override
     public List<LocationInfo> filter(List<LocationInfo> allLocations) {
         if (allLocations == null || allLocations.isEmpty()) {
@@ -32,6 +41,13 @@ public class HaversineCompressor implements LocationCompressor {
         return filtered;
     }
 
+    /**
+     * Calculates the haversine distance between two locations
+     *
+     * @param l1 first location
+     * @param l2 second location
+     * @return the haversine distance between two points
+     */
     private double haversineDistance(LocationInfo l1, LocationInfo l2) {
         double lat1 = l1.getLatitude();
         double lat2 = l2.getLatitude();
