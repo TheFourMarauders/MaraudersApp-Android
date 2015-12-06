@@ -2,7 +2,8 @@
 
 We used Gradle 1.3.1 to build our project with the target SDK version 21. The dependencies for our app are listed below.
 
-dependencies {
+
+
     compile fileTree(dir: 'libs', include: ['*.jar'])
     testCompile 'junit:junit:4.12'
     compile 'com.google.android.gms:play-services:7.8.0'
@@ -21,4 +22,3 @@ dependencies {
     compile('com.mikepenz:materialdrawer:4.0.8@aar') {
         transitive = true
     }
-}
