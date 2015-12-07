@@ -29,6 +29,9 @@ import java.util.List;
 
 /**
  * Created by joe on 11/11/15.
+ *
+ * Drawer extended when settings button is pressed. User can choose whether to display oldest
+ * information, newest information, or both
  */
 public class SettingsDrawerView extends DrawerView {
     private ToggleDrawerItem oldest, newest;
@@ -37,6 +40,15 @@ public class SettingsDrawerView extends DrawerView {
     private List<DrawerItem> drawerItems;
     private boolean oldestChecked, newestChecked;
 
+    /**
+     * Constructor that makes the drawer items in the settings drawer view
+     *
+     * @param remote
+     * @param storage
+     * @param drawerManager
+     * @param pollingManager
+     * @param ctx
+     */
     public SettingsDrawerView(ServerComm remote, final SharedPrefsAccessor storage, final DrawerManager drawerManager, PollingManager pollingManager, Context ctx) {
         super(remote, storage, drawerManager, pollingManager, ctx);
         final List<DrawerItem> items = new ArrayList<>();
@@ -147,6 +159,11 @@ public class SettingsDrawerView extends DrawerView {
 
     }
 
+    /**
+     *  Determines whether to display date picker to choose dates/times to display on maps activity
+     *
+     * @param isStart
+     */
     private void startDateTimeDialog(final boolean isStart) {
         final View dialogView = View.inflate(ctx, R.layout.date_time_dialog, null);
         final AlertDialog alertDialog = new AlertDialog.Builder(ctx).create();

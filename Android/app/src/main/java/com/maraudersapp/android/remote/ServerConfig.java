@@ -1,6 +1,8 @@
 package com.maraudersapp.android.remote;
 
 /**
+ * Class for getting the url strings to communicate with server
+ *
  * Created by Matthew on 10/16/2015.
  */
 public class ServerConfig {

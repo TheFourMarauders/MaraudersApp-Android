@@ -16,11 +16,22 @@ import java.util.Set;
 
 /**
  * Created by Michael on 10/27/2015.
+ *
+ * Drawer view displayed when the user clicks on the groups tab in the main drawer view
  */
 public class GroupsDrawerView extends DrawerView {
 
     private List<DrawerItem> drawerItems;
 
+    /**
+     *
+     * @param remote
+     * @param storage
+     * @param drawerManager
+     * @param pm
+     * @param ctx
+     * @param groups groups that are presented in our new groups drawer view
+     */
     public GroupsDrawerView(ServerComm remote, SharedPrefsAccessor storage,
                              final DrawerManager drawerManager, PollingManager pm, final Context ctx, Set<GroupInfo> groups) {
         super(remote, storage, drawerManager, pm, ctx);

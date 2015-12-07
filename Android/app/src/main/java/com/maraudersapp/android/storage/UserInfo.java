@@ -1,5 +1,8 @@
 package com.maraudersapp.android.storage;
 
+/**
+ * POJO used to represent information about a user of the app.
+ */
 public class UserInfo {
 
     private String username, firstName, lastName;
@@ -10,6 +13,9 @@ public class UserInfo {
         this.lastName = lastName;
     }
 
+    /**
+     * Creates a user with no first name or last name.
+     */
     public UserInfo(String username) {
         this(username, "", "");
     }

@@ -19,7 +19,7 @@ import butterknife.ButterKnife;
 import butterknife.InjectView;
 
 /**
- * Created by brent on 10/8/15.
+ * Activity for signing the user up for the app.
  */
 public class SignUpActivity extends AppCompatActivity{
 
@@ -33,6 +33,9 @@ public class SignUpActivity extends AppCompatActivity{
     private SharedPrefsAccessor storage;
     private ServerComm remote;
 
+    /**
+     * Register button callbacks.
+     */
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -64,6 +67,9 @@ public class SignUpActivity extends AppCompatActivity{
         storage = new SharedPrefsAccessor(getApplicationContext());
     }
 
+    /**
+     * Signs the user up with infomation in the text boxes if they are valid.
+     */
     public void signup() {
 
         if (!validate()) {
@@ -95,6 +101,9 @@ public class SignUpActivity extends AppCompatActivity{
     }
 
 
+    /**
+     * Called when signup is successful. Starts the main activity.
+     */
     public void onSignupSuccess() {
         Toast.makeText(getBaseContext(), "Signup Successful!", Toast.LENGTH_LONG).show();
         signUpButton.setEnabled(true);
@@ -103,11 +112,19 @@ public class SignUpActivity extends AppCompatActivity{
         startActivity(i);
     }
 
+    /**
+     * Called when signup failed.
+     */
     public void onSignupFailed(String msg) {
         Toast.makeText(getBaseContext(), msg, Toast.LENGTH_LONG).show();
         signUpButton.setEnabled(true);
     }
 
+    /**
+     * Checks whether username and password is valid.
+     *
+     * @return true if username and password valid. False otherwise.
+     */
     public boolean validate() {
         boolean valid = true;
         String username = usernameText.getText().toString();

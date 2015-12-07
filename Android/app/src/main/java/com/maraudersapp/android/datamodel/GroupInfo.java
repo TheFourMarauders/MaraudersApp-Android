@@ -7,6 +7,8 @@ import java.util.Set;
 
 /**
  * Created by Matthew on 10/16/2015.
+ *
+ * Class for group info. contains members, id and name
  */
 public class GroupInfo {
     private Set<String> members;
@@ -14,6 +16,7 @@ public class GroupInfo {
     private String name;
 
     @JsonCreator
+
     public GroupInfo(
             @JsonProperty("members") Set<String> members,
             @JsonProperty("_id") String _id,

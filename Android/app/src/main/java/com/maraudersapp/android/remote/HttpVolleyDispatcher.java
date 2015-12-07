@@ -33,6 +33,8 @@ import java.util.Map;
 import java.util.Set;
 
 /**
+ * Class that communicates to server using url's and adds these requests to a queue of requests
+ *
  * Created by Matthew on 10/16/2015.
  */
 public class HttpVolleyDispatcher implements ServerComm {
@@ -50,6 +52,12 @@ public class HttpVolleyDispatcher implements ServerComm {
         queue.start();
     }
 
+    /**
+     * Uses a post request to create a new user
+     *
+     * @param u json for the user that will be created
+     * @param callback
+     */
     @Override
     public void createUser(UserCreationInfo u, final RemoteCallback<String> callback) {
         PushRequest<UserCreationInfo> req = new PushRequest<>(PushRequestType.POST, callback,
@@ -59,6 +67,13 @@ public class HttpVolleyDispatcher implements ServerComm {
 
     }
 
+    /**
+     * Push request to send a friend request
+     *
+     * @param sourceUsername currently logged in user
+     * @param targetUsername user that we want to send friend request to
+     * @param callback
+     */
     @Override
     public void sendFriendRequest(String sourceUsername, String targetUsername,
                                   RemoteCallback<String> callback) {
@@ -67,6 +82,12 @@ public class HttpVolleyDispatcher implements ServerComm {
         queue.add(req);
     }
 
+    /**
+     * Get request to get the friend requests for the logged in user
+     *
+     * @param username currently logged in user
+     * @param callback
+     */
     @Override
     public void getFriendRequestsFor(String username, RemoteCallback<Set<UserInfo>> callback) {
         GetRequest<Set<UserInfo>> req = new GetRequest<>(callback,
@@ -75,6 +96,13 @@ public class HttpVolleyDispatcher implements ServerComm {
         queue.add(req);
     }
 
+    /**
+     * Push request to accept a pending friend request
+     *
+     * @param username currently logged in user
+     * @param targetFriend friend to accept request of
+     * @param callback
+     */
     @Override
     public void acceptFriendRequest(String username, String targetFriend, RemoteCallback<String> callback) {
         PushRequest<String> req = new PushRequest<>(PushRequestType.PUT, callback,
@@ -82,6 +110,13 @@ public class HttpVolleyDispatcher implements ServerComm {
         queue.add(req);
     }
 
+    /**
+     * Push request to remove friend
+     *
+     * @param username currently logged in user
+     * @param targetFriend friend to remove
+     * @param callback
+     */
     @Override
     public void removeFriend(String username, String targetFriend, RemoteCallback<String> callback) {
         PushRequest<String> req = new PushRequest<>(PushRequestType.DELETE, callback,
@@ -89,6 +124,12 @@ public class HttpVolleyDispatcher implements ServerComm {
         queue.add(req);
     }
 
+    /**
+     * Get request to get friends of currently logged in user
+     *
+     * @param username currently logged in user
+     * @param callback
+     */
     @Override
     public void getFriendsFor(String username, RemoteCallback<Set<UserInfo>> callback) {
         GetRequest<Set<UserInfo>> req = new GetRequest<>(callback,
@@ -97,6 +138,14 @@ public class HttpVolleyDispatcher implements ServerComm {
         queue.add(req);
     }
 
+    /**
+     * Get request to get the locations for the user
+     *
+     * @param username user to get locations of
+     * @param start start time
+     * @param end end time
+     * @param callback
+     */
     @Override
     public void getLocationsFor(String username, Date start, Date end, RemoteCallback<List<LocationInfo>> callback) {
         GetRequest<List<LocationInfo>> req = new GetRequest<>(callback,
@@ -106,6 +155,13 @@ public class HttpVolleyDispatcher implements ServerComm {
         queue.add(req);
     }
 
+    /**
+     * Push request to put new locations for the user
+     *
+     * @param username user
+     * @param locations list of locations to put
+     * @param callback
+     */
     @Override
     public void putLocationsFor(String username, List<LocationInfo> locations, RemoteCallback<String> callback) {
         PushRequest<List<LocationInfo>> req = new PushRequest<>(PushRequestType.PUT, callback,
@@ -114,6 +170,12 @@ public class HttpVolleyDispatcher implements ServerComm {
         queue.add(req);
     }
 
+    /**
+     * Push request to create a new group
+     *
+     * @param groupName name of group to create
+     * @param callback
+     */
     @Override
     public void createGroup(String groupName, RemoteCallback<String> callback) {
         PushRequest<String> req = new PushRequest<>(PushRequestType.POST, callback,
@@ -122,6 +184,12 @@ public class HttpVolleyDispatcher implements ServerComm {
         queue.add(req);
     }
 
+    /**
+     * Get request to get the groups for the currently logged in user
+     *
+     * @param username user to get groups for
+     * @param callback
+     */
     @Override
     public void getGroupsFor(String username, RemoteCallback<Set<GroupInfo>> callback) {
         GetRequest<Set<GroupInfo>> req = new GetRequest<>(callback,
@@ -130,6 +198,12 @@ public class HttpVolleyDispatcher implements ServerComm {
         queue.add(req);
     }
 
+    /**
+     * Get request to get the group from the group id
+     *
+     * @param groupId id of group
+     * @param callback
+     */
     @Override
     public void getGroupById(String groupId, RemoteCallback<GroupInfo> callback) {
         GetRequest<GroupInfo> req = new GetRequest<>(callback,
@@ -139,6 +213,13 @@ public class HttpVolleyDispatcher implements ServerComm {
         queue.add(req);
     }
 
+    /**
+     * Push request to add a user to a group
+     *
+     * @param groupId id of the group
+     * @param username user to add to group
+     * @param callback
+     */
     @Override
     public void addUserToGroup(String groupId, String username, RemoteCallback<String> callback) {
         PushRequest<String> req = new PushRequest<>(PushRequestType.PUT, callback,
@@ -147,6 +228,13 @@ public class HttpVolleyDispatcher implements ServerComm {
         queue.add(req);
     }
 
+    /**
+     * Push request to remove user from group
+     *
+     * @param groupId id of group
+     * @param username user to remove from group
+     * @param callback
+     */
     @Override
     public void removeUserFromGroup(String groupId, String username, RemoteCallback<String> callback) {
         PushRequest<String> req = new PushRequest<>(PushRequestType.DELETE, callback,
@@ -155,6 +243,14 @@ public class HttpVolleyDispatcher implements ServerComm {
         queue.add(req);
     }
 
+    /**
+     * Get request to get the locations of group members
+     *
+     * @param groupId id of group
+     * @param start start time
+     * @param end end time
+     * @param callback
+     */
     @Override
     public void getGroupLocations(String groupId, Date start, Date end, RemoteCallback<Map<String, List<LocationInfo>>> callback) {
         ObjectMapper mapper = new ObjectMapper();
@@ -168,6 +264,11 @@ public class HttpVolleyDispatcher implements ServerComm {
         queue.add(req);
     }
 
+    /**
+     * Specifics the format of a get request
+     *
+     * @param <T> generic type
+     */
     private class GetRequest<T> extends Request<T> {
         private RemoteCallback<T> callback;
         private String url;
@@ -207,6 +308,11 @@ public class HttpVolleyDispatcher implements ServerComm {
         }
     }
 
+    /**
+     * Specifies format of push request
+     *
+     * @param <B> generic type
+     */
     private class PushRequest<B> extends Request<String> {
         private RemoteCallback<String> callback;
         private String url;
@@ -292,6 +398,11 @@ public class HttpVolleyDispatcher implements ServerComm {
         }
     }
 
+    /**
+     * Authentication method
+     *
+     * @param headers
+     */
     private void addAuth(Map<String, String> headers) {
         SharedPrefsAccessor storage = new SharedPrefsAccessor(context);
         String username = storage.getUsername();

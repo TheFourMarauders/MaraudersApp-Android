@@ -8,14 +8,27 @@ import android.util.Log;
 import android.widget.EditText;
 
 /**
- * Created by Michael on 10/28/2015.
+ * Creates a dialog to display to the user with a input text box and an enter button.
  */
 public class InputDialog extends AlertDialog.Builder {
 
+    /**
+     * Used as a callback for when text is entered.
+     */
     public interface OnTextEntered {
+
+        /**
+         * Called when text is entered.
+         *
+         * @param text Text that was entered.
+         */
         public void onTextEntered(String text);
     }
 
+    /**
+     * @param title Title to display on dialog
+     * @param callback Callback for when text is entered.
+     */
     public InputDialog(Context ctx, String title, final OnTextEntered callback) {
         super(ctx);
         setTitle(title);

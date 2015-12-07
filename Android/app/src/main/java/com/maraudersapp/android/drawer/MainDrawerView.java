@@ -28,6 +28,8 @@ import java.util.Set;
 
 /**
  * Created by Michael on 10/27/2015.
+ *
+ * This is the actual main drawer that is displayed when the menu button is pressed
  */
 public class MainDrawerView extends DrawerView {
 
@@ -170,6 +172,15 @@ public class MainDrawerView extends DrawerView {
             },
     };
 
+    /**
+     * Constructor for main drawer. Logic for class is mainly defined in the drawer items we specify
+     *
+     * @param remote
+     * @param storage
+     * @param drawerManager
+     * @param pollingManager
+     * @param ctx
+     */
     public MainDrawerView(ServerComm remote, SharedPrefsAccessor storage, DrawerManager drawerManager,
                           PollingManager pollingManager, Context ctx) {
         super(remote, storage, drawerManager, pollingManager, ctx);
@@ -190,6 +201,11 @@ public class MainDrawerView extends DrawerView {
         return true;
     }
 
+    /**
+     * Logs user out of the application. Credentials are still saved on device
+     *
+     * @param view
+     */
     private void logout(View view) {
         LocationUpdaterService.stopLocationPolling(ctx);
         pollingManager.stopPolling();

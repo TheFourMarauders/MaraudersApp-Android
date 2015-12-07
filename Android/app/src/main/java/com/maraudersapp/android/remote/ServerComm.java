@@ -11,6 +11,8 @@ import java.util.Map;
 import java.util.Set;
 
 /**
+ * Interface for all the calls to the server
+ *
  * Created by Matthew on 10/16/2015.
  */
 public interface ServerComm {
